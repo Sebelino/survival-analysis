@@ -1,0 +1,15 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# Test
+
+```{r, message=FALSE}
+source("main.R")
+```
+
+```{r}
+actuarial
+```
