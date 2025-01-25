@@ -62,3 +62,31 @@ plt <- ggsurvplot(
   ggtheme = theme_minimal()
 )
 print(plt)
+
+set.seed(12345)
+d <- biostat3::colon_sample |>
+  transform(entry_mm = ifelse(
+    yydx == 1985,
+    sample(13:24, 35, replace = TRUE),
+    ifelse(
+      yydx == 1986,
+      sample(1:12, 35, replace = TRUE),
+      0
+    )
+  ))
+## check that all of the entry dates are less than the survival times
+stopifnot(with(d, all(entry_mm < surv_mm)))
+d$status_bin <- ifelse(d$status == "Dead: cancer", 1, 0)
+truncated_fit <- survfit(Surv(entry_mm, surv_mm, status_bin)~1, data=d)
+
+plt <- ggsurvplot(
+  truncated_fit,
+  data = d,
+  conf.int = TRUE,
+  risk.table = FALSE,
+  xlab = "Discontinuation time",
+  ylab = "Estimated survivor function",
+  title = "Kaplan-Meier Survival Curve",
+  ggtheme = theme_minimal()
+)
+print(plt)
