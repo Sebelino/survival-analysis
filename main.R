@@ -35,8 +35,7 @@ kaplan_meier <- function(time, event) {
   surv <- Surv(time, event)
   fit <- survfit(surv ~ 1)
   summary <- fit |> summary()
-  varsum <- with(summary, cumsum(n.event / (n.risk * (n.risk - n.event))))
-  var_log <- summary$surv^2 * varsum # Or: summary$std.err^2
+  var_log <- with(summary, cumsum(n.event / (n.risk * (n.risk - n.event))))
   return(data.frame(
     time = summary$time,
     surv = summary$surv,
