@@ -36,10 +36,15 @@ kaplan_meier <- function(time, event) {
   fit <- survfit(surv ~ 1)
   summary <- fit |> summary()
   var_log <- with(summary, cumsum(n.event / (n.risk * (n.risk - n.event))))
+  z <- qnorm(1-(1-0.95)/2)
+  lower_ci <- log(summary$surv) - z * sqrt(var_log)
+  upper_ci <- log(summary$surv) + z * sqrt(var_log)
   return(data.frame(
     time = summary$time,
     surv = summary$surv,
-    var_log = var_log
+    var_log = var_log,
+    lower_ci = lower_ci,
+    upper_ci = upper_ci
   ))
 }
 
