@@ -1,0 +1,5 @@
+# survival-analysis
+
+```bash
+make
+```
