@@ -17,3 +17,14 @@ plot(actuarial,
 )
 lines(actuarial, type = "s", lty = 2)
 
+kaplan_meier <- survfit(
+  Surv(surv_mm, status_bin) ~ 1,
+  data = sample
+)
+
+kaplan_meier |> plot(
+  xlab = "Discontinuation time",
+  ylab = "Estimated survivor function",
+  conf.int = FALSE,
+  ylim = 0:1
+)
