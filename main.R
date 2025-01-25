@@ -11,18 +11,20 @@ actuarial <- lifetab2(Surv(surv_yy, status_bin) ~ 1,
 )
 
 plot(actuarial,
-  type = "p", pch = 19,
-  xlab = "Survival time", ylab = "Estimated survivor function",
+  type = "p",
+  pch = 19,
+  xlab = "Survival time",
+  ylab = "Estimated survivor function",
   ylim = 0:1
 )
 lines(actuarial, type = "s", lty = 2)
 
-kaplan_meier <- survfit(
+kaplan <- survfit(
   Surv(surv_mm, status_bin) ~ 1,
   data = sample
 )
 
-kaplan_meier |> plot(
+kaplan |> plot(
   xlab = "Discontinuation time",
   ylab = "Estimated survivor function",
   conf.int = FALSE,
