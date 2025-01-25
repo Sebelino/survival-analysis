@@ -30,3 +30,17 @@ kaplan |> plot(
   conf.int = FALSE,
   ylim = 0:1
 )
+
+kaplan_meier <- function(time, event) {
+  surv <- Surv(time, event)
+  fit <- survfit(surv ~ 1)
+  output <- fit |>
+    summary() |>
+    (\(x) data.frame(
+      time = x$time,
+      surv = x$surv
+    ))()
+  return(output)
+}
+
+out <- kaplan_meier(sample$surv_mm, sample$status_bin)
