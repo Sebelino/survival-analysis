@@ -34,13 +34,14 @@ kaplan |> plot(
 kaplan_meier <- function(time, event) {
   surv <- Surv(time, event)
   fit <- survfit(surv ~ 1)
-  output <- fit |>
-    summary() |>
-    (\(x) data.frame(
-      time = x$time,
-      surv = x$surv
-    ))()
-  return(output)
+  summary <- fit |> summary()
+  varsum <- with(summary, cumsum(n.event / (n.risk * (n.risk - n.event))))
+  var_log <- summary$surv^2 * varsum # Or: summary$std.err^2
+  return(data.frame(
+    time = summary$time,
+    surv = summary$surv,
+    var_log = var_log
+  ))
 }
 
 out <- kaplan_meier(sample$surv_mm, sample$status_bin)
