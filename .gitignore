@@ -1,8 +1,9 @@
 # From running quatro add ...
 _extensions
 
-q1.html
-q2.html
-q3.html
-q4.html
+*.html
+*.pdf
+
 .Rproj.user
+*.Rproj
+*.png
