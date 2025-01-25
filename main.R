@@ -48,3 +48,17 @@ kaplan_meier <- function(time, event) {
 }
 
 out <- kaplan_meier(sample$surv_mm, sample$status_bin)
+
+library(survminer)
+
+plt <- ggsurvplot(
+  kaplan,
+  data = sample,
+  conf.int = TRUE,
+  risk.table = FALSE,
+  xlab = "Discontinuation time",
+  ylab = "Estimated survivor function",
+  title = "Kaplan-Meier Survival Curve",
+  ggtheme = theme_minimal()
+)
+print(plt)
