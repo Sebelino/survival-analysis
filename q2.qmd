@@ -1,0 +1,125 @@
+---
+title: "BDS: Survival analysis with applications in medicine"
+author:
+- Mark Clements
+format:
+  html:
+    minimal: true
+filters:
+  - webr
+execute:
+  echo: true
+  message: false
+  cache: false
+  fig-width: 7
+  fig-height: 6
+---
+
+
+# Exercise 2. Comparing survival proportions and mortality rates by stage for cause-specific and all-cause survival #
+	
+- The purpose of this exercise is to study survival of the patients using two alternative measures --- survival proportions and mortality rates. A second purpose is to study the difference between cause-specific and all-cause survival.
+- Each group should be prepared to present and discuss their findings. Ideally, the presentation should use Rmarkdown or Quarto (especially the `webr` filter for Quarto) and HTML.
+- For the R code, you should generally restrict your attention to the R packages used in the course. Within your group, you can suggest the introduction of **one** further R package on CRAN for each exercise.
+- For course development:
+  - Please note (a) how long this exercise takes and (b) any suggested improvements for the exercise (e.g. errors, ambuiguities, or if the exercises are overly difficult or too simple).
+
+
+```{webr-r}
+#| autorun: true
+#| results: "hide"
+library(biostat3) # melanoma
+melanoma <- 
+    transform(biostat3::melanoma,
+              death_cancer = ifelse(status == "Dead: cancer", 1, 0),
+              death_all = ifelse(status %in% c("Dead: cancer", "Dead: other"), 1, 0))
+```
+
+We then list the first few observations to get an idea about the data.
+
+```{webr-r}
+#| autorun: true
+#| results: 'asis'
+library(knitr)    # kable()
+head(melanoma) |> knitr::kable("html")
+```
+
+## (a) Plot estimates of survival by stage ##
+
+- Tabulate the distribution of the melanoma patients by cancer stage at diagnosis. What do you see?
+
+```{webr-r}
+```
+
+- Does the age distribution vary by stage?
+
+```{webr-r}
+```
+
+- Plot cause-specific survival by stage. Does it appear that stage is associated with patient survival?
+
+```{webr-r}
+library(survival)
+```
+
+
+## (b) Estimate the mortality rates for each stage ##
+
+- Using the `dplyr`, `data.table` or `sqldf` packages, calculate the mortality rates for cause-specific death by stage. Calculate 95% confidence intervals for the mortality rates. What are the units of the estimated rates? 
+
+```{webr-r}
+## library(dplyr)
+```
+
+## (c) Differences by sex ##
+
+- Study whether cause-specific survival is different for males and females (both by plotting the survivor function and by tabulating mortality rates). Is there a difference in survival between males and females? If yes, is the difference present throughout the follow up?
+
+```{webr-r}
+```
+
+## (d) All cause mortality for melanoma patients ##
+
+The plots you made above were based on cause-specific survival
+(i.e., only deaths due to cancer are counted as events, deaths
+due to other causes are censored). In the next part of this
+question we will estimate all-cause survival (i.e., any death is
+counted as an event). First, however, study the coding of vital
+status and tabulate vital status by age group.
+
+- How many patients die of each cause? Does the distribution of
+cause of death depend on age?
+
+
+```{webr-r}
+```
+
+## (e) All cause survival ##
+
+- To get all-cause survival, specify all deaths (both cancer
+and other) as events. Now plot the survival function for all-cause survival
+by stage. Is the survival proportion different compared to
+the cause-specific survival you estimated above? Why?
+
+```{webr-r}
+```
+
+## (f) Comparing cause-specific and all cause survival for those aged 75 years and over ##
+
+- It is more common to die from a cause other than cancer at
+older ages. How does this impact the survival proportion for
+different stages? Compare cause-specific and all-cause survival
+by plotting the survival proportion by stage for the oldest age
+group (75+ years) for both cause-specific and
+all-cause survival.
+
+```{webr-r}
+```
+
+## (g) Comparing cause-specific and all cause survival by age ##
+
+- Now estimate both cancer-specific and all-cause survival for
+        each age group. What do you observe?
+
+```{webr-r}
+```

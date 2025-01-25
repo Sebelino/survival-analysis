@@ -1,0 +1,83 @@
+---
+title: "BDS: Survival analysis with applications in medicine"
+author:
+- Mark Clements
+format:
+  html:
+    minimal: true
+filters:
+  - webr
+execute:
+  echo: true
+  message: false
+  cache: false
+  fig-width: 7
+  fig-height: 6
+---
+
+## Exercise 4. Localised melanoma: Comparing actuarial and Kaplan-Meier approaches with discrete time data ##
+
+- The aim of this exercise is to examine the effect of heavily grouped data (i.e., data with lots of ties) on estimates of survival made using the Kaplan-Meier method and the actuarial method.
+- Each group should be prepared to present and discuss their findings. Ideally, the presentation should use Rmarkdown or Quarto (especially the `webr` filter for Quarto) and HTML.
+- For the R code, you should generally restrict your attention to the R packages used in the course. Within your group, you can suggest the introduction of **one** further R package on CRAN for each exercise.
+- For course development, please note: (a) how long this exercise takes; and (b) any suggested improvements for the exercise (e.g. errors, ambuiguities, or if the exercises are overly difficult or too simple).
+
+------
+
+- For the patients diagnosed with localised skin melanoma, estimate the 10-year cause-specific survival proportion. Use both the Kaplan-Meier method and the actuarial method. Do this both with survival time recorded in completed years and survival time recorded in completed months. That is, you should obtain 4 separate estimates of the 10-year cause-specific survival proportion to complete the cells of the following table. The purpose of this exercise is to illustrate small differences between the two methods when there are large numbers of ties.
+
+- In order to reproduce the results in the printed solutions you’ll need to restrict to localised stage and estimate cause-specific survival ("Dead: cancer" indicates an event). Look at the code in the previous questions if you are unsure.
+
+```{webr-r}
+#| autorun: true
+library(biostat3) # melanoma
+localised <- subset(biostat3::melanoma, stage=="Localised") |>
+    transform(death_cancer = ifelse(status == "Dead: cancer", 1, 0))
+```
+
+- We then list the first few observations to get an idea about the data.
+
+```{webr-r}
+#| results: 'asis'
+library(knitr) # kable()
+head(melanoma) |> knitr::kable("html")
+```
+
+## (a) ##
+
+- Of the two estimates (Kaplan-Meier and actuarial) made using time recorded in years, which do you think is the most appropriate and why? [HINT: Consider how each of the methods handle ties.]
+
+
+- Show the actuarial estimates, using survival time in completed years.
+
+```{webr-r}
+```
+
+- Show the actuarial estimates, using survival time in completed months. Only showing 20 months around the 10th year.
+
+```{webr-r}
+```
+
+- Discuss whether the actuarial estimates should be joined using linear interpolation or using a piecewise contant curve (steps). What are the advantages and disadvantages of each approach?
+
+## (b) ##
+
+- Show the Kaplan-Meier estimates, using survival time in completed  years.
+
+```{webr-r}
+```
+
+- Show the Kaplan-Meier estimates, using survival time in completed months. Only showing 20 months around the 10th year.
+
+```{webr-r}
+```
+
+- Which of the two estimates (Kaplan-Meier or actuarial) changes most when using survival time in months rather than years? Why?
+
+
+## (c) ##
+
+Plot the four sets of curves for a graphical comparison. Describe the direction of the bias for the Kaplan-Meier curves using completed years.
+
+```{webr-r}
+```
