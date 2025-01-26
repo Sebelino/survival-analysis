@@ -6,4 +6,7 @@ _extensions
 
 .Rproj.user
 *.Rproj
+*.RData
+*.Rhistory
+
 *.png
