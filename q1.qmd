@@ -160,6 +160,11 @@ kaplan |> plot(
 )
 ```
 
+Interpretation:
+The steps are fairly large and the confidence interval is wide, indicating that
+the sample size is small (35). There is a long period during which nobody dies
+of cancer, but individuals are right-censored repeatedly.
+
 
 - Investigate using the `survminer::ggsurvplot` function for `ggplot2`-based graphics of survival.
 
@@ -217,6 +222,14 @@ plt <- ggsurvplot(
 )
 print(plt)
 ```
+
+Interpretation: The left-truncated curve is almost identical the the
+untruncated curve. The left-truncated curve is vertically shifted slightly
+towards the bottom. There are 6 delayed entries, so we start with a risk set of
+29 individuals instead of 35. The conditional probability of surviving a time
+interval is 1-d/n, which becomes closer to 0 if n is smaller. Since the
+survival function is a product of the conditional probabilities, the value of
+the survival function will also decrease.
 
 - Implement the Kaplan-Meier estimator for left truncated and right censored data as R code. Check that you get the same results as `survfit`.
 
