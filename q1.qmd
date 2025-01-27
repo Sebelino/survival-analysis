@@ -88,7 +88,7 @@ To estimate survival using the Kaplan-Meier approach you may find it easiest to 
 |          |           |       |       |       |        |
 |          |           |       |       |       |        |
 
-
+<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTItxAOyn4xjoGzQTSZ6BQMtMa41w6HzzTTXcqALzR5RlRW_q1oprasVz-vxKGeeEAIoA1vsoQxlVr_/pubhtml" target="_blank">Google Spreadsheet</a>
 
 ## (b) Write R code to implement the Kaplan-Meier estimator for those data
 
@@ -97,9 +97,28 @@ To estimate survival using the Kaplan-Meier approach you may find it easiest to 
 - Extend the function to calculate confidence intervals of survival on the $\log(survival)$ scale.
 
 ```{webr-r}
-kaplan_meier = function(time, event) {
-	return NULL
+data <- biostat3::colon_sample
+data$status_bin <- ifelse(data$status == "Dead: cancer", 1, 0)
+
+kaplan_meier <- function(time, event) {
+  surv <- Surv(time, event)
+  fit <- survfit(surv ~ 1)
+  summary <- fit |> summary()
+  var_log <- with(summary, cumsum(n.event / (n.risk * (n.risk - n.event))))
+  z <- qnorm(1 - (1 - 0.95) / 2)
+  lower_ci <- log(summary$surv) - z * sqrt(var_log)
+  upper_ci <- log(summary$surv) + z * sqrt(var_log)
+  return(data.frame(
+    time = summary$time,
+    surv = summary$surv,
+    var_log = var_log,
+    lower_ci = lower_ci,
+    upper_ci = upper_ci
+  ))
 }
+
+kaplan_table <- kaplan_meier(data$surv_mm, data$status_bin)
+kaplan_table
 ```
 
 ## (c) Using existing R functions to validate the calculations in (a) and (b)
@@ -108,14 +127,37 @@ kaplan_meier = function(time, event) {
 
 ```{webr-r}
 library(biostat3)
-## biostat3::lifetab2(...)
+actuarial <- biostat3::lifetab2(Surv(surv_yy, status_bin) ~ 1,
+  data = data,
+  breaks = c(seq(0, 10, by = 1), Inf)
+)
+actuarial
+
+plot(actuarial,
+  type = "p",
+  pch = 19,
+  xlab = "Survival time",
+  ylab = "Estimated survivor function",
+  ylim = 0:1
+)
+lines(actuarial, type = "s", lty = 2)
 ```
 
 - Print a summary and plot (using base graphics) the Kaplan-Meier estimator using the `survival` package. Interpret the form of the survival function and its confidence intervals.
 
 ```{webr-r}
 library(survival)
-## survival::survfit(...)
+
+kaplan <- survfit(
+  Surv(surv_mm, status_bin) ~ 1,
+  data = data
+)
+
+kaplan |> plot(
+  xlab = "Discontinuation time",
+  ylab = "Estimated survivor function",
+  ylim = 0:1
+)
 ```
 
 
@@ -123,7 +165,18 @@ library(survival)
 
 ```{webr-r}
 library(survminer)
-## survminer::ggsurvplot(...)
+
+plt <- ggsurvplot(
+  kaplan,
+  data = data,
+  conf.int = TRUE,
+  risk.table = FALSE,
+  xlab = "Discontinuation time",
+  ylab = "Estimated survivor function",
+  title = "Kaplan-Meier Survival Curve",
+  ggtheme = theme_minimal()
+)
+print(plt)
 ```
 
 ## (d) Left truncated data
@@ -148,13 +201,65 @@ kable(d, "html")
 
 ```{webr-r}
 library(survival)
-## survival::survfit(...)
+d$status_bin <- ifelse(d$status == "Dead: cancer", 1, 0)
+truncated_fit <- survfit(Surv(entry_mm, surv_mm, status_bin) ~ 1, data = d)
+
+truncated_fit |> summary()
+plt <- ggsurvplot(
+  truncated_fit,
+  data = d,
+  conf.int = TRUE,
+  risk.table = FALSE,
+  xlab = "Discontinuation time",
+  ylab = "Estimated survivor function",
+  title = "Kaplan-Meier Survival Curve",
+  ggtheme = theme_minimal()
+)
+print(plt)
 ```
 
 - Implement the Kaplan-Meier estimator for left truncated and right censored data as R code. Check that you get the same results as `survfit`.
 
 ```{webr-r}
-kaplan_meier = function(entry_time, exit_time, event) {
-	return NULL
+kaplan_meier_truncated <- function(entry_time, exit_time, event) {
+  # Combine the data into a data frame and order by exit_time
+  data <- data.frame(entry_time, exit_time, event)
+  data <- data[order(data$exit_time), ]
+
+  # Extract unique exit times
+  unique_times <- unique(data$exit_time)
+
+  # Initialize variables
+  n_at_risk <- numeric(length(unique_times))
+  n_events <- numeric(length(unique_times))
+  survival <- numeric(length(unique_times))
+
+  # Loop through unique times to calculate survival probabilities
+  for (i in seq_along(unique_times)) {
+    t <- unique_times[i]
+
+    # Number at risk at time t (accounting for left truncation)
+    n_at_risk[i] <- sum(data$entry_time <= t & data$exit_time >= t)
+
+    # Number of events at time t
+    n_events[i] <- sum(data$exit_time == t & data$event == 1)
+
+    # Survival probability
+    if (i == 1) {
+      survival[i] <- 1 - n_events[i] / n_at_risk[i]
+    } else {
+      survival[i] <- survival[i - 1] * (1 - n_events[i] / n_at_risk[i])
+    }
+  }
+
+  # Return the results as a data frame
+  return(data.frame(
+    time = unique_times,
+    n_at_risk = n_at_risk,
+    n_events = n_events,
+    survival = survival
+  ))
 }
+kmt <- kaplan_meier_truncated(d$entry_mm, d$surv_mm, d$status_bin)
+kmt
 ```
