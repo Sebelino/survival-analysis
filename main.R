@@ -19,6 +19,8 @@ plot(actuarial,
 )
 lines(actuarial, type = "s", lty = 2)
 
+library(survival)
+
 kaplan <- survfit(
   Surv(surv_mm, status_bin) ~ 1,
   data = data
@@ -76,8 +78,8 @@ d <- biostat3::colon_sample |>
   ))
 ## check that all of the entry dates are less than the survival times
 stopifnot(with(d, all(entry_mm < surv_mm)))
-d$status_bin <- ifelse(d$status == "Dead: cancer", 1, 0)
 
+d$status_bin <- ifelse(d$status == "Dead: cancer", 1, 0)
 truncated_fit <- survfit(Surv(entry_mm, surv_mm, status_bin) ~ 1, data = d)
 
 plt <- ggsurvplot(
