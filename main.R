@@ -112,7 +112,7 @@ kaplan_meier_truncated <- function(entry_time, exit_time, event) {
     t <- unique_times[i]
 
     # Number at risk at time t (accounting for left truncation)
-    n_at_risk[i] <- sum(events$entry_time <= t & events$exit_time >= t)
+    n_at_risk[i] <- sum(events$entry_time < t & events$exit_time >= t)
 
     # Number of events at time t
     n_events[i] <- sum(events$exit_time == t & events$event == 1)
