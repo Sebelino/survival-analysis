@@ -2,11 +2,11 @@ library(biostat3)
 library(collett)
 library(xtable)
 
-sample <- biostat3::colon_sample
-sample$status_bin <- ifelse(sample$status == "Dead: cancer", 1, 0)
+data <- biostat3::colon_sample
+data$status_bin <- ifelse(data$status == "Dead: cancer", 1, 0)
 
 actuarial <- biostat3::lifetab2(Surv(surv_yy, status_bin) ~ 1,
-  data = sample,
+  data = data,
   breaks = c(seq(0, 10, by = 1), Inf)
 )
 
@@ -21,7 +21,7 @@ lines(actuarial, type = "s", lty = 2)
 
 kaplan <- survfit(
   Surv(surv_mm, status_bin) ~ 1,
-  data = sample
+  data = data
 )
 
 kaplan |> plot(
@@ -47,13 +47,13 @@ kaplan_meier <- function(time, event) {
   ))
 }
 
-out <- kaplan_meier(sample$surv_mm, sample$status_bin)
+out <- kaplan_meier(data$surv_mm, data$status_bin)
 
 library(survminer)
 
 plt <- ggsurvplot(
   kaplan,
-  data = sample,
+  data = data,
   conf.int = TRUE,
   risk.table = FALSE,
   xlab = "Discontinuation time",
