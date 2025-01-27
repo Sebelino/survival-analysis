@@ -47,7 +47,7 @@ kaplan_meier <- function(time, event) {
   ))
 }
 
-out <- kaplan_meier(data$surv_mm, data$status_bin)
+kaplan_table <- kaplan_meier(data$surv_mm, data$status_bin)
 
 library(survminer)
 
