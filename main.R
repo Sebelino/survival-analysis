@@ -96,11 +96,11 @@ print(plt)
 
 kaplan_meier_truncated <- function(entry_time, exit_time, event) {
   # Combine the data into a data frame and order by exit_time
-  data <- data.frame(entry_time, exit_time, event)
-  data <- data[order(data$exit_time), ]
+  events <- data.frame(entry_time, exit_time, event)
+  events <- events[order(events$exit_time), ]
 
   # Extract unique exit times
-  unique_times <- unique(data$exit_time)
+  unique_times <- unique(events$exit_time)
 
   # Initialize variables
   n_at_risk <- numeric(length(unique_times))
@@ -112,10 +112,10 @@ kaplan_meier_truncated <- function(entry_time, exit_time, event) {
     t <- unique_times[i]
 
     # Number at risk at time t (accounting for left truncation)
-    n_at_risk[i] <- sum(data$entry_time <= t & data$exit_time >= t)
+    n_at_risk[i] <- sum(events$entry_time <= t & events$exit_time >= t)
 
     # Number of events at time t
-    n_events[i] <- sum(data$exit_time == t & data$event == 1)
+    n_events[i] <- sum(events$exit_time == t & events$event == 1)
 
     # Survival probability
     if (i == 1) {
