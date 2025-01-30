@@ -69,7 +69,7 @@ summary_stats <- melanoma %>%
   )
 print(summary_stats)
 
-# Kruskal-Wallis test
+# Kruskal-Wallis test, good for (skewed) age data which may not be normal
 test <- kruskal.test(age ~ stage, data = melanoma)
 print(test)
 ```
