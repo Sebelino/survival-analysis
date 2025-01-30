@@ -49,17 +49,53 @@ head(melanoma) |> knitr::kable("html")
 - Tabulate the distribution of the melanoma patients by cancer stage at diagnosis. What do you see?
 
 ```{webr-r}
+distribution <- table(melanoma$stage)
+print(distribution)
 ```
 
 - Does the age distribution vary by stage?
 
 ```{webr-r}
+library(dplyr)
+summary_stats <- melanoma %>%
+  group_by(stage) %>%
+  summarise(
+    mean_age = mean(age, na.rm = TRUE),
+    median_age = median(age, na.rm = TRUE),
+    sd_age = sd(age, na.rm = TRUE),
+    min_age = min(age, na.rm = TRUE),
+    max_age = max(age, na.rm = TRUE),
+    n = n()
+  )
+print(summary_stats)
+
+# Kruskal-Wallis test
+test <- kruskal.test(age ~ stage, data = melanoma)
+print(test)
 ```
+
+p < 2.101e-08, so age distribution significantly varies by cancer stage.
 
 - Plot cause-specific survival by stage. Does it appear that stage is associated with patient survival?
 
 ```{webr-r}
 library(survival)
+library(survminer)
+km_fit <- survfit(Surv(time=surv_mm,event=death_cancer) ~ stage, data = melanoma)
+
+plt <- ggsurvplot(
+  km_fit,
+  data = melanoma,
+  conf.int = TRUE, # Add confidence intervals
+  pval = TRUE, # Show p-value for log-rank test
+  risk.table = TRUE, # Include a risk table
+  legend.title = "Cancer Stage",
+  xlab = "Time (Months)",
+  ylab = "Cause-Specific Survival Probability",
+  title = "Kaplan-Meier Survival Curves by Cancer Stage",
+  ggtheme = theme_minimal()
+)
+print(plt)
 ```
 
 
@@ -68,15 +104,59 @@ library(survival)
 - Using the `dplyr`, `data.table` or `sqldf` packages, calculate the mortality rates for cause-specific death by stage. Calculate 95% confidence intervals for the mortality rates. What are the units of the estimated rates? 
 
 ```{webr-r}
-## library(dplyr)
+rate_summary <- melanoma %>%
+  group_by(stage) %>%
+  summarise(
+    events = sum(death_cancer),
+    person_time = sum(surv_yy),
+    rate = events / person_time,
+    se_rate = sqrt(events) / person_time,
+    lcl = rate - 1.96 * se_rate,
+    ucl = rate + 1.96 * se_rate
+  )
+print(rate_summary)
 ```
+
+`surv_yy` is given in years, so the unit is deaths per person-year.
 
 ## (c) Differences by sex ##
 
 - Study whether cause-specific survival is different for males and females (both by plotting the survivor function and by tabulating mortality rates). Is there a difference in survival between males and females? If yes, is the difference present throughout the follow up?
 
 ```{webr-r}
+km_fit_sex <- survfit(Surv(surv_mm, death_cancer) ~ sex, data = melanoma)
+
+plt_sex <- ggsurvplot(
+  km_fit_sex,
+  data = melanoma,
+  conf.int = TRUE,             # Add confidence intervals
+  risk.table = TRUE,           # Add risk table
+  pval = TRUE,                 # Log-rank test p-value
+  xlab = "Time (Years)",
+  ylab = "Cause-Specific Survival Probability",
+  title = "Cause-Specific Survival Curves by Sex",
+  legend.title = "Sex",
+  ggtheme = theme_minimal()
+)
+
+print(plt_sex)
+
+df_rates_sex <- melanoma %>%
+  group_by(sex) %>%
+  summarise(
+    events      = sum(death_cancer),      # Total cause-specific deaths
+    person_time = sum(surv_yy),          # Total person-time at risk
+    rate        = events / person_time,   # Cause-specific mortality rate
+    se_rate     = sqrt(events) / person_time, # Standard error of rate
+    lcl         = rate - 1.96 * se_rate,  # Lower confidence limit
+    ucl         = rate + 1.96 * se_rate   # Upper confidence limit
+  )
+
+print(df_rates_sex)
 ```
+
+Log-rank test shows p < 0.0001, so the differences are
+statistically different.
 
 ## (d) All cause mortality for melanoma patients ##
 
@@ -92,7 +172,26 @@ cause of death depend on age?
 
 
 ```{webr-r}
+library(dplyr)
+melanoma %>%
+  group_by(status) %>%
+  summarise(count=n(), .groups="drop")
+
+contingency_table_status <- table(melanoma$agegrp, melanoma$status)
+
+# Filter to include only rows related to death causes
+contingency_table_death <- contingency_table_status[, c("Dead: other", "Dead: cancer")]
+print(contingency_table_death)
+
+# Perform chi-square test
+chi_square_status <- chisq.test(contingency_table_death)
+
+print(chi_square_status)
 ```
+
+p < 2.2e-16, so the distribution of cause of death depends on age.
+In younger ages, most deaths are due to cancer.
+As age increases, the proportion of deaths due to other causes rises.
 
 ## (e) All cause survival ##
 
@@ -102,7 +201,40 @@ by stage. Is the survival proportion different compared to
 the cause-specific survival you estimated above? Why?
 
 ```{webr-r}
+library(survival)
+library(survminer)
+# Fit Kaplan-Meier survival curves for all-cause survival by stage
+km_fit_all_cause <- survfit(Surv(surv_mm, death_all) ~ stage, data = melanoma)
+
+# Plot the survival curves
+plt_all_cause <- ggsurvplot(
+  km_fit_all_cause,
+  data = melanoma,
+  conf.int = TRUE,             # Add confidence intervals
+  risk.table = TRUE,           # Include risk table
+  pval = TRUE,                 # Log-rank test p-value
+  xlab = "Time (Years)",
+  ylab = "All-Cause Survival Probability",
+  title = "All-Cause Survival Curves by Stage",
+  legend.title = "Stage",
+  ggtheme = theme_minimal()
+)
+
+print(plt_all_cause)
 ```
+
+All-cause survival is lower compared to cause-specific survival.
+This is because we now treat death of any cause as an event,
+so the curve will decrease more rapidly.
+
+Individuals in stage Unknown and Localised have lower survival when
+considering all causes compared to when considering cancer as a cause.
+The cause-specific survival ranges decreases from 1.0 to 0.75 over a
+20-year period, while the all-cause survival decreases from 1.0 to 0.50
+over the same period.
+
+The difference between the curves is small for stage Distant,
+because most deaths are due to cancer in this stage.
 
 ## (f) Comparing cause-specific and all cause survival for those aged 75 years and over ##
 
@@ -114,6 +246,50 @@ group (75+ years) for both cause-specific and
 all-cause survival.
 
 ```{webr-r}
+library(survival)
+library(survminer)
+library(dplyr)
+
+# Filter dataset for the oldest age group (75+ years)
+melanoma_75plus <- melanoma %>% filter(agegrp == "75+")
+
+# Cause-specific survival by stage for 75+ years
+km_fit_cause_specific <- survfit(Surv(surv_yy, death_cancer) ~ stage, data = melanoma_75plus)
+
+# All-cause survival by stage for 75+ years
+km_fit_all_cause <- survfit(Surv(surv_yy, death_all) ~ stage, data = melanoma_75plus)
+
+# Plot cause-specific survival
+plt_cause_specific <- ggsurvplot(
+  km_fit_cause_specific,
+  data = melanoma_75plus,
+  conf.int = TRUE,
+  risk.table = TRUE,
+  pval = TRUE,
+  xlab = "Time (Years)",
+  ylab = "Survival Probability",
+  title = "Cause-Specific Survival (75+ Years)",
+  legend.title = "Stage",
+  ggtheme = theme_minimal()
+)
+
+# Plot all-cause survival
+plt_all_cause <- ggsurvplot(
+  km_fit_all_cause,
+  data = melanoma_75plus,
+  conf.int = TRUE,
+  risk.table = TRUE,
+  pval = TRUE,
+  xlab = "Time (Years)",
+  ylab = "Survival Probability",
+  title = "All-Cause Survival (75+ Years)",
+  legend.title = "Stage",
+  ggtheme = theme_minimal()
+)
+
+# Print both plots
+print(plt_cause_specific)
+print(plt_all_cause)
 ```
 
 ## (g) Comparing cause-specific and all cause survival by age ##
@@ -122,4 +298,49 @@ all-cause survival.
         each age group. What do you observe?
 
 ```{webr-r}
+library(survival)
+library(survminer)
+
+# Cause-specific survival by age group
+km_fit_cause_specific_age <- survfit(Surv(surv_yy, death_cancer) ~ agegrp, data = melanoma)
+
+# All-cause survival by age group
+km_fit_all_cause_age <- survfit(Surv(surv_yy, death_all) ~ agegrp, data = melanoma)
+
+# Plot cause-specific survival by age group
+plt_cause_specific_age <- ggsurvplot(
+  km_fit_cause_specific_age,
+  data = melanoma,
+  conf.int = TRUE,
+  risk.table = TRUE,
+  pval = TRUE,
+  xlab = "Time (Years)",
+  ylab = "Survival Probability",
+  title = "Cause-Specific Survival by Age Group",
+  legend.title = "Age Group",
+  ggtheme = theme_minimal()
+)
+
+# Plot all-cause survival by age group
+plt_all_cause_age <- ggsurvplot(
+  km_fit_all_cause_age,
+  data = melanoma,
+  conf.int = TRUE,
+  risk.table = TRUE,
+  pval = TRUE,
+  xlab = "Time (Years)",
+  ylab = "Survival Probability",
+  title = "All-Cause Survival by Age Group",
+  legend.title = "Age Group",
+  ggtheme = theme_minimal()
+)
+
+# Print both plots
+print(plt_cause_specific_age)
+print(plt_all_cause_age)
 ```
+
+Younger age groups consistently have a better chance of surviving.
+
+Those in the older age groups die faster of any cause compared to
+dying from cancer.
