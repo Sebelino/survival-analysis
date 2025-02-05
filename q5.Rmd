@@ -32,12 +32,12 @@ split_data <- colon |>
     x = 0 + (year8594 == "Diagnosed 85-94")
   ) |>
   survSplit(
-    Surv(surv_mm,event) ~ .,
+    Surv(surv_mm, event) ~ .,
     data = _,
     cut = seq(0, max(colon$surv_mm)),
     episode = "timeband"
   ) |>
-  select(-subsite, -surv_yy, -year8594, -agegrp) |>
+  select(-subsite, -surv_yy, -year8594, -ydx, -yexit) |>
   transform(
     pt = surv_mm - tstart,
     mid_t = (tstart + surv_mm) / 2
@@ -50,6 +50,17 @@ stopifnot(total_pt_org == total_pt_split)
 total_events_org <- sum(colon$status == "Dead: cancer")
 total_events_split <- sum(split_data$event)
 stopifnot(total_events_org == total_events_split)
+
+with(biostat3::colon, c(
+  nrow = length(status),
+  total_events = sum(status == "Dead: cancer"),
+  total_person_time = sum(surv_mm)
+))
+with(split_data, c(
+  nrow = length(status),
+  total_events = sum(event),
+  total_person_time = sum(pt)
+))
 ```
 
 ## (b) Poisson model fit
@@ -57,6 +68,11 @@ stopifnot(total_events_org == total_events_split)
 Fit a Poisson regression model adjusting for time from diagnosis, stage of diagnosis and age group at diagnosis. You can choose the functional form for modelling time from diagnosis. Write out the regression model and interpret the parameters.
 
 ```{r}
+model <- glm(
+  formula = event ~ surv_mm + stage + agegrp + offset(log(pt)),
+  data = split_data
+)
+summary(model)
 ```
 
 ## (c) Hazard predictions
@@ -66,6 +82,19 @@ Fit a Poisson regression model adjusting for time from diagnosis, stage of diagn
 Predict the hazard for a patient aged 55 years diagnosed with distant cancer at 5 and 10 years. 
 
 ```{r}
+new_data <- data.frame(
+  surv_mm = c(5 * 12, 10 * 12),
+  stage = factor("Distant", levels = levels(split_data$stage)),
+  agegrp = factor("45-59", levels = levels(split_data$agegrp)),
+  pt = 1
+)
+log_hazard <- predict(model, newdata = new_data, type = "link")
+hazard <- exp(log_hazard)
+data.frame(
+  time_years = new_data$surv_mm / 12,
+  log_hazard = log_hazard,
+  hazard = hazard
+)
 ```
 
 ### (ii)
@@ -73,6 +102,9 @@ Predict the hazard for a patient aged 55 years diagnosed with distant cancer at 
 What is the design matrix for the linear predictor for the log hazards? Given the variance-covariance matrix for the regression coefficients and the design matrix, show how to calculate the standard error for the linear predictor for the the log hazards. Moreover, calculate the 95% confidence intervals for the log hazards.
 
 ```{r}
+design_matrix <- model.matrix(model)
+head(design_matrix)
+vcov(model)
 ```
 
 ### (iii)
