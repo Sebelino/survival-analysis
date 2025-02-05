@@ -1,0 +1,121 @@
+---
+title: "BDS: Survival analysis with applications in medicine"
+author:
+- Mark Clements
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "")
+```
+
+# Exercise 5. Delta method for variance estimation with a Poisson regression model.
+
+In outline, we will investigate **cause-specific mortality** after a diagnosis of colon cancer. We will seek to estimate the hazards and survival by calendar year of diagnosis, including standard errors and 95% confidence intervals.
+
+```{r, message=FALSE}
+library(biostat3) # colon
+library(dplyr)
+```
+
+## (a) Split by time
+
+Using the `biostat3::colon` data-frame, split time from diagnosis (`surv_mm`) by month. Use either `survSplit` or `dplyr`. Check that the total person-time and number of events is the same before and after splitting.
+
+```{r}
+split_data <- colon |>
+  transform(
+    event = status == "Dead: cancer",
+    x = 0 + (year8594 == "Diagnosed 85-94")
+  ) |>
+  survSplit(
+    Surv(surv_mm,event) ~ .,
+    data = _,
+    cut = seq(0, max(colon$surv_mm)),
+    episode = "timeband"
+  ) |>
+  select(-subsite, -surv_yy, -year8594, -agegrp) |>
+  transform(
+    pt = surv_mm - tstart,
+    mid_t = (tstart + surv_mm) / 2
+  )
+
+total_pt_org <- sum(colon$surv_mm)
+total_pt_split <- sum(split_data$pt)
+stopifnot(total_pt_org == total_pt_split)
+
+total_events_org <- sum(colon$status == "Dead: cancer")
+total_events_split <- sum(split_data$event)
+stopifnot(total_events_org == total_events_split)
+```
+
+## (b) Poisson model fit
+
+Fit a Poisson regression model adjusting for time from diagnosis, stage of diagnosis and age group at diagnosis. You can choose the functional form for modelling time from diagnosis. Write out the regression model and interpret the parameters.
+
+```{r}
+```
+
+## (c) Hazard predictions
+
+### (i)
+
+Predict the hazard for a patient aged 55 years diagnosed with distant cancer at 5 and 10 years. 
+
+```{r}
+```
+
+### (ii)
+
+What is the design matrix for the linear predictor for the log hazards? Given the variance-covariance matrix for the regression coefficients and the design matrix, show how to calculate the standard error for the linear predictor for the the log hazards. Moreover, calculate the 95% confidence intervals for the log hazards.
+
+```{r}
+```
+
+### (iii)
+
+Check your calculations for (ii) using `predict(..., se.fit=TRUE)`.
+
+```{r}
+```
+
+## (c) Survival predictions
+
+### (i)
+
+We can use `predict(object, newdata, type="response")` to predict the hazard at a given time. Write a function `h` with signature `function(t)` to predict the hazard for a patient aged 55 years diagnosed with distant cancer at time `t`. Ensure that this function allows for `t` to be a vector and return a vector of hazards (e.g. `h(1:10)`).
+
+```{r}
+```
+
+### (ii) 
+
+Using the function `h` from (i) and the `integrate` function, calculating the cumulative hazard to 60 months and 120 months (hint: use `value` from the `integrate` object). Calculate survival at 60 and 120 months.
+
+```{r}
+```
+
+### (iii) 
+
+Write a function `grad` to calculate the gradient of some function `g` with respect to a vector `x` using two-sided finite differences. Specifically, 
+\begin{align*}
+\frac{\partial g(\boldsymbol{x})}{\partial x_j} &= \frac{g(\boldsymbol{x}+\boldsymbol{e}_j \epsilon)-g(\boldsymbol{x}-\boldsymbol{e}_j \epsilon)}{2\epsilon}
+\end{align*}
+where $\epsilon=10^{-5}$ and $\boldsymbol{e}_j$ is a unit vector which includes one at the $j$-th position and otherwise zeros. 
+
+
+```{r}
+grad <- function(g, x) {
+  ## returns the gradient of g(x) with respect to each coefficient
+}
+```
+
+### (iv)
+
+Use `grad` to calculate the gradients for predicted survival at 60 and 120 months with respect to the regression model coefficients (hint: your function `g` will need to change the `coefficients` in the `glm` object). Using the delta method, use the gradients and the variance-covariance matrix to calculate the standard errors for survival at 60 and 120 months. Finally, calculate the 95% confidence interval for survival at 60 and 120 months.
+
+```{r}
+```
