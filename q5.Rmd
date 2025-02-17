@@ -102,9 +102,30 @@ data.frame(
 What is the design matrix for the linear predictor for the log hazards? Given the variance-covariance matrix for the regression coefficients and the design matrix, show how to calculate the standard error for the linear predictor for the the log hazards. Moreover, calculate the 95% confidence intervals for the log hazards.
 
 ```{r}
-design_matrix <- model.matrix(model)
-head(design_matrix)
-vcov(model)
+# design_matrix <- model.matrix(model)
+design_matrix <- model.matrix(~ surv_mm + stage + agegrp, data = new_data)
+design_matrix
+
+covariance_matrix <- vcov(model)
+covariance_matrix
+
+var_eta <- diag(design_matrix %*% covariance_matrix %*% t(design_matrix))
+se_eta <- sqrt(var_eta)
+
+# Compute confidence intervals
+ci_lower <- log_hazard - 1.96 * se_eta
+ci_upper <- log_hazard + 1.96 * se_eta
+
+# Create a data frame with results
+results <- data.frame(
+  time_years = new_data$surv_mm / 12,
+  log_hazard = log_hazard,
+  se_log_hazard = se_eta,
+  ci_lower = ci_lower,
+  ci_upper = ci_upper
+)
+
+print(results)
 ```
 
 ### (iii)
@@ -112,6 +133,7 @@ vcov(model)
 Check your calculations for (ii) using `predict(..., se.fit=TRUE)`.
 
 ```{r}
+predict(model, newdata = new_data, type = "link", se.fit = TRUE)
 ```
 
 ## (c) Survival predictions
@@ -121,6 +143,20 @@ Check your calculations for (ii) using `predict(..., se.fit=TRUE)`.
 We can use `predict(object, newdata, type="response")` to predict the hazard at a given time. Write a function `h` with signature `function(t)` to predict the hazard for a patient aged 55 years diagnosed with distant cancer at time `t`. Ensure that this function allows for `t` to be a vector and return a vector of hazards (e.g. `h(1:10)`).
 
 ```{r}
+h <- function(t) {
+  # Create a new data frame for the given time points
+  new_data <- data.frame(
+    surv_mm = t * 12, # Convert years to months
+    stage = factor("Distant", levels = levels(split_data$stage)),
+    agegrp = factor("45-59", levels = levels(split_data$agegrp)),
+    pt = 1
+  )
+
+  # Predict hazard using type="response" (which exponentiates log-hazard)
+  hazard <- predict(model, newdata = new_data, type = "response")
+
+  return(pmax(hazard, 0))
+}
 ```
 
 ### (ii) 
@@ -128,6 +164,25 @@ We can use `predict(object, newdata, type="response")` to predict the hazard at 
 Using the function `h` from (i) and the `integrate` function, calculating the cumulative hazard to 60 months and 120 months (hint: use `value` from the `integrate` object). Calculate survival at 60 and 120 months.
 
 ```{r}
+cumulative_hazard <- function(t) {
+  result <- integrate(h, lower = 0, upper = t)
+  return(result$value) # Extract the numerical result of the integration
+}
+H_60 <- cumulative_hazard(5) # 5 years
+H_120 <- cumulative_hazard(10) # 10 years
+
+# Compute survival probabilities
+S_60 <- exp(-H_60)
+S_120 <- exp(-H_120)
+
+# Print results
+results <- data.frame(
+  time_months = c(60, 120),
+  cumulative_hazard = c(H_60, H_120),
+  survival_probability = c(S_60, S_120)
+)
+
+print(results)
 ```
 
 ### (iii) 
@@ -142,7 +197,25 @@ where $\epsilon=10^{-5}$ and $\boldsymbol{e}_j$ is a unit vector which includes 
 ```{r}
 grad <- function(g, x) {
   ## returns the gradient of g(x) with respect to each coefficient
+  epsilon <- 1e-5 # Small perturbation value
+  n <- length(x) # Number of elements in x
+  gradient <- numeric(n) # Initialize gradient vector
+
+  for (j in 1:n) {
+    e_j <- rep(0, n) # Create unit vector
+    e_j[j] <- epsilon # Set perturbation at the j-th position
+
+    # Compute finite difference approximation
+    gradient[j] <- (g(x + e_j) - g(x - e_j)) / (2 * epsilon)
+  }
+
+  return(gradient)
 }
+
+g <- function(x) sum(x^2)
+g(3)
+g(3:4)
+grad(g, 1:3)
 ```
 
 ### (iv)
@@ -150,4 +223,67 @@ grad <- function(g, x) {
 Use `grad` to calculate the gradients for predicted survival at 60 and 120 months with respect to the regression model coefficients (hint: your function `g` will need to change the `coefficients` in the `glm` object). Using the delta method, use the gradients and the variance-covariance matrix to calculate the standard errors for survival at 60 and 120 months. Finally, calculate the 95% confidence interval for survival at 60 and 120 months.
 
 ```{r}
+# Function to compute survival probability for given model coefficients
+g <- function(beta, t) {
+  # Update the model coefficients
+  model$coefficients <- beta
+
+  # Define hazard function h(t) based on updated model
+  h <- function(t) {
+    new_data <- data.frame(
+      surv_mm = t * 12,
+      stage = factor("Distant", levels = levels(split_data$stage)),
+      agegrp = factor("45-59", levels = levels(split_data$agegrp)),
+      pt = 1
+    )
+
+    return(predict(model, newdata = new_data, type = "response"))
+  }
+
+  # Compute cumulative hazard H(t)
+  H_t <- integrate(h, lower = 0, upper = t)$value
+
+  # Compute survival probability S(t)
+  S_t <- exp(-H_t)
+
+  return(S_t)
+}
+
+# Compute gradient using finite differences
+grad_survival_60 <- grad(function(beta) g(beta, 5), model$coefficients)
+grad_survival_120 <- grad(function(beta) g(beta, 10), model$coefficients)
+
+# Extract variance-covariance matrix
+cov_matrix <- vcov(model)
+
+# Compute variance using the delta method
+var_survival_60 <- t(grad_survival_60) %*% cov_matrix %*% grad_survival_60
+var_survival_120 <- t(grad_survival_120) %*% cov_matrix %*% grad_survival_120
+
+# Compute standard errors
+se_survival_60 <- sqrt(var_survival_60)
+se_survival_120 <- sqrt(var_survival_120)
+
+# Compute predicted survival probabilities
+survival_60 <- g(model$coefficients, 5)
+survival_120 <- g(model$coefficients, 10)
+
+# Compute 95% confidence intervals
+ci_lower_60 <- survival_60 - 1.96 * se_survival_60
+ci_upper_60 <- survival_60 + 1.96 * se_survival_60
+
+ci_lower_120 <- survival_120 - 1.96 * se_survival_120
+ci_upper_120 <- survival_120 + 1.96 * se_survival_120
+
+# Create results data frame
+results_survival <- data.frame(
+  time_months = c(60, 120),
+  survival_estimate = c(survival_60, survival_120),
+  se_survival = c(se_survival_60, se_survival_120),
+  ci_lower = c(ci_lower_60, ci_lower_120),
+  ci_upper = c(ci_upper_120, ci_upper_120)
+)
+
+# Print results
+print(results_survival)
 ```
