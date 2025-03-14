@@ -61,7 +61,7 @@ Accelerated survival time model survival function:
 \[\exp(-\lambda\exp(-k\tilde{\beta} x) t^k)\]
 We see that the survival functions are equal if
 the log hazard ratio is related to the log time ratio like so:
-\[\beta = k\tilde{\beta}\]
+\[\beta = -k\tilde{\beta}\]
 
 # B.1.
 
