@@ -23,9 +23,27 @@ Let \(\lambda' = \lambda\exp(\beta x)\). Then:
     =& \exp(-\lambda' t^k) \\
 \end{align*}
 
-which has the form of a Weibull distribution with shape parameter $k$ and scale parameter $\lambda'$.
+which has the form of a Weibull distribution
+with shape parameter $k$ and scale parameter
+\(\lambda' = \lambda\exp(-k\tilde{\beta} x)\).
 
 # A.2.
+
+Let \(\lambda' = \lambda\exp(-k\tilde{\beta} x)\). Then:
+
+\begin{align*}
+    & S(t|x) \\
+    =& S_0(t \exp(-\tilde{\beta} x)) \\
+    =& \exp(-\lambda(t \exp(-\tilde{\beta} x))^k) \\
+    =& \exp(-\lambda t^k \exp(-\tilde{\beta} x)^k) \\
+    =& \exp(-\lambda t^k \exp(-k\tilde{\beta} x)) \\
+    =& \exp(-\lambda\exp(-k\tilde{\beta} x) t^k) \\
+    =& \exp(-\lambda' t^k ) \\
+\end{align*}
+
+which has the form of a Weibull distribution
+with shape parameter $k$ and scale parameter
+\(\lambda' = \lambda\exp(-k\tilde{\beta} x)\).
 
 # A.3.
 
