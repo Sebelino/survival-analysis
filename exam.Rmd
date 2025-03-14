@@ -62,8 +62,13 @@ Accelerated survival time model survival function:
 We see that the survival functions are equal if
 the log hazard ratio is related to the log time ratio like so:
 \[\beta = -k\tilde{\beta}\]
+Given that the shape parameter \(k\) is positive,
+this means
+a positive \(\beta\) implies a negative \(\tilde{\beta}\).
 
 # B.1.
+
+
 
 # B.2.
 
