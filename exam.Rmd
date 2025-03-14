@@ -1,0 +1,68 @@
+---
+title: "Survival Analysis: Take-home Exam"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "")
+```
+
+# A.1.
+
+Let \(\lambda' = \lambda\exp(\beta x)\). Then:
+
+\begin{align*}
+    & S(t|x) \\
+    =& S_0(t)^{\exp(\beta x)} \\
+    =& \exp(-\lambda t^k)^{\exp(\beta x)} \\
+    =& \exp(-\lambda t^k\exp(\beta x)) \\
+    =& \exp(-\lambda\exp(\beta x) t^k) \\
+    =& \exp(-\lambda' t^k) \\
+\end{align*}
+
+which has the form of a Weibull distribution with shape parameter $k$ and scale parameter $\lambda'$.
+
+# A.2.
+
+# A.3.
+
+# B.1.
+
+# B.2.
+
+# C.1.
+
+# C.2.
+
+# C.3.
+
+# C.4.
+
+# D.1.
+
+# D.2.
+
+# D.3.
+
+# D.4.
+
+# E.1.
+
+# E.2.
+
+# E.3.
+
+# E.4.
+
+# F.1.
+
+# F.2.
+
+
+```{r, message=FALSE}
+library(biostat3) # colon
+library(dplyr)
+```
