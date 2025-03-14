@@ -12,7 +12,9 @@ knitr::opts_chunk$set(echo = TRUE, comment = "")
 
 # A.1.
 
-Let \(\lambda' = \lambda\exp(\beta x)\). Then:
+Let \(\lambda_1 = \lambda\exp(\beta x)\).
+Then the proportional hazards model has a survival time function
+of the form:
 
 \begin{align*}
     & S(t|x) \\
@@ -20,16 +22,18 @@ Let \(\lambda' = \lambda\exp(\beta x)\). Then:
     =& \exp(-\lambda t^k)^{\exp(\beta x)} \\
     =& \exp(-\lambda t^k\exp(\beta x)) \\
     =& \exp(-\lambda\exp(\beta x) t^k) \\
-    =& \exp(-\lambda' t^k) \\
+    =& \exp(-\lambda_1 t^k) \\
 \end{align*}
 
 which has the form of a Weibull distribution
 with shape parameter $k$ and scale parameter
-\(\lambda' = \lambda\exp(-k\tilde{\beta} x)\).
+\(\lambda_1 = \lambda\exp(-k\tilde{\beta} x)\).
 
 # A.2.
 
-Let \(\lambda' = \lambda\exp(-k\tilde{\beta} x)\). Then:
+Let \(\lambda_2 = \lambda\exp(-k\tilde{\beta} x)\).
+Then the accelerated survival time model has a survival time function
+of the form:
 
 \begin{align*}
     & S(t|x) \\
@@ -38,14 +42,22 @@ Let \(\lambda' = \lambda\exp(-k\tilde{\beta} x)\). Then:
     =& \exp(-\lambda t^k \exp(-\tilde{\beta} x)^k) \\
     =& \exp(-\lambda t^k \exp(-k\tilde{\beta} x)) \\
     =& \exp(-\lambda\exp(-k\tilde{\beta} x) t^k) \\
-    =& \exp(-\lambda' t^k ) \\
+    =& \exp(-\lambda_2 t^k ) \\
 \end{align*}
 
 which has the form of a Weibull distribution
 with shape parameter $k$ and scale parameter
-\(\lambda' = \lambda\exp(-k\tilde{\beta} x)\).
+\(\lambda_2 = \lambda\exp(-k\tilde{\beta} x)\).
 
 # A.3.
+
+Proportional hazards model survival function:
+\[\exp(-\lambda\exp(\beta x) t^k)\]
+Accelerated survival time model survival function:
+\[\exp(-\lambda\exp(-k\tilde{\beta} x) t^k)\]
+We see that the survival functions are equal if
+the log hazard ratio is related to the log time ratio like so:
+\[\beta = k\tilde{\beta}\]
 
 # B.1.
 
