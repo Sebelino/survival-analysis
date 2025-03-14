@@ -6,6 +6,10 @@ output:
     highlight: github
 ---
 
+# AI disclosure
+
+ChatGPT was used to review my solutions and for grammar and clarity checks.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, comment = "")
 ```
