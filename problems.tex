@@ -1,0 +1,55 @@
+\documentclass{article}
+\title{Problem set, MT5017}
+\author{Ville Sebastian Olsson}
+\usepackage[a4paper,margin=2em]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{dsfont}
+\usepackage{mathtools}
+\usepackage[parfill]{parskip}
+\usepackage{hyperref} % Clickable ToC
+\usepackage{tikz}
+\usepackage[breakable]{tcolorbox}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{csvsimple}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{csquotes}
+\graphicspath{ {./images/} }
+\hypersetup{colorlinks}
+
+\usepackage{sebelino-mathlib} % Custom sty file
+\setcounter{secnumdepth}{0} % Disable numbering
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section{Risk difference is collapsible}
+
+Prove that the risk difference of \(X\) and \(Y\) is collapsible on \(Z\) if
+\(Z\) is unassociated with \(X\).
+
+\begin{proof}
+Let
+\[RD(P,X,Y) = P(Y=1|X=1)-P(Y=1|X=0)\]
+\[RD(P,X,Y|Z) = P(Y=1|X=1,Z)-P(Y=1|X=0,Z)\]
+We want to prove that
+\[E_Z[RD(P,X,Y|Z)] = RD(P,X,Y)\]
+under the condition that \(Z\bot\!\!\!\bot X\) (?).
+
+
+\begin{align*}
+	& E_Z[RD(P,X,Y|Z)] \\
+	=& \sum_{z\in\img{Z}} P(Z=z)RD(P,X,Y|Z=z) & (\text{LoTP}) \\
+	=& \sum_{z\in\img{Z}} P(Z=z)(P(Y=1|X=1,Z=z)-P(Y=1|X=0,Z=z)) \\
+	=& \sum_{z\in\img{Z}} P(Z=z)(\frac{P(Y=1,X=1,Z=z)}{P(X=1,Z=z)}-\frac{P(Y=1,X=0,Z=z)}{P(X=0,Z=z)}) \\
+	=& \sum_{z\in\img{Z}} P(Z=z)(\frac{P(Y=1,X=1,Z=z)}{P(X=1)P(Z=z)}-\frac{P(Y=1,X=0,Z=z)}{P(X=0)P(Z=z)}) \\
+\end{align*}
+
+\end{proof}
+
+\end{document}
