@@ -10,3 +10,10 @@ _extensions
 *.Rhistory
 
 *.png
+
+*.fls
+*.log
+*.out
+*.aux
+*.toc
+*.fdb_latexmk
