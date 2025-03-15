@@ -105,6 +105,7 @@ Log-likelihood contribution for \(n\) individuals:
 
 ## b)
 
+Log-likelihood contribution for individual \(i\):
 \begin{align*}
     & \ell_i \\
     =& \ln(S(u_i) - S(v_i)) - \ln S(t_i) \\
@@ -114,10 +115,62 @@ Log-likelihood contribution for \(n\) individuals:
     =& \ln \exp\left(-\int_0^{u_i} h(t)dt\right) + \ln\left(1 - \exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right) - \ln \exp\left(-\int_0^{t_i} h(t)dt\right) \\
     =& -\int_0^{u_i} h(t)dt + \ln\left(1 - \exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right) +\int_0^{t_i} h(t)dt \\
     =& \ln\left(1 - \exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right) - \int_{t_i}^{u_i} h(t)dt
-
 \end{align*}
 
+<!-- TODO n individuals case as well? -->
+
 # B.2.
+
+```{r, message=FALSE, echo=FALSE}
+library(survival)
+```
+
+According to the documentation [REF] and source code [REF]
+for version `3.8-3` of the package,
+the function takes the following arguments:
+
+* `time`: Number.
+* `time2`: Number.
+* `event`: Either 0, 1, 2, 3, TRUE or FALSE.
+* `type`: Any of the strings: `'right'`, `'left'`, `'interval'`, `'counting'`, `'interval2'`, `'mstate'`.
+* `origin`: Number.
+
+Let us assume that it is possible to express the tuple \((t_i,u_i,v_i)\)
+using the `Surv` function.
+Then it is possible to do so by
+a function call of the form:
+```{r, eval=FALSE}
+Surv(time=a, time2=b, event=c, type=d, origin=e)
+```
+Since $t_i$, $u_i$, and $v_i$ are arbitrary numbers,
+we cannot pass them to the function via the `event` or `type` arguments.
+Hence, $t_i$, $u_i$, and $v_i$
+can only be passed to the function using the
+`time`, `time2`, and `origin` arguments.
+
+Further, it is reasonable to presume that
+$t_i$, $u_i$, and $v_i$ are passed to the function
+via the `time`, `time2`, and `origin` arguments in a bijective manner.
+That is, the `Surv` function is not implemented in a way such that,
+for example, the data contained in the $t_i$ and $u_i$ values are cleverly encoded together so they can be passed using a single argument, e.g. `time`.
+
+However, according to the documentation and source code,
+the `origin` argument simply shifts the time scale,
+by subtracting from `time` and `time2`.
+Left truncation requires `type='counting'` which
+does not allow for interval censoring.
+On the other hand, interval censoring requires `type='interval'`
+which does not allow for left truncation.
+It is therefore not possible to use this argument to pass
+information regarding left truncation or interval censoring.
+
+Hence, we are left with only two arguments: `time` and `time2`
+for passing the three values.
+By the pigeonhole principle,
+it is not possible to pass three values using only two arguments.
+Thus, our initial assumption is incorrect.
+It is not possible to express the tuple \((t_i,u_i,v_i)\)
+using the `Surv` function.
 
 # C.1.
 
