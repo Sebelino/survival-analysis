@@ -268,9 +268,54 @@ our value in C3:
 
 # D.1.
 
+Partial likelihood:
 \[L(\boldsymbol{\beta}) = \prod_{i=1}^n \left(\frac{\exp(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta})}{\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})}\right)^{\delta_i}\]
 
+where
+
+* \(i\) indexes the individuals,
+* \(t_i\) is the observed time for individual \(i\),
+* \(\delta_i=1\) if individual \(i\) experienced the event at \(t_i\) and \(0\) otherwise,
+* \(\mathbf{x}_i(t)\) is the time-varying covariate vector for individual \(i\) at time \(t\),
+* \(\boldsymbol{\beta}\) is a vector of regression coefficients,
+* \(R(t_i)\) is the risk set at time \(t_i\). 
+
+<!-- TODO Clearly defined notation?? -->
+
 # D.2.
+Let \(\boldsymbol{\beta} = (\beta_1,\ldots,\beta_p)\),
+\(\mathbf{x}_i(t) = (x_{i,1}(t),\ldots,x_{i,p}(t))\) for all \(t\) and \(i\in\{1,\ldots,n\}\).
+
+Partial log-likelihood:
+\begin{align*}
+    & \ln L(\boldsymbol{\beta}) \\
+    =& \ln \prod_{i=1}^n \left(\frac{\exp(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta})}{\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})}\right)^{\delta_i} \\
+    =& \sum_{i=1}^n \delta_i\ln\frac{\exp(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta})}{\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})} \\
+    =& \sum_{i=1}^n \delta_i\left(\ln\exp(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta}) - \ln \left(\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})\right)\right) \\
+    =& \sum_{i=1}^n \delta_i\left(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta} - \ln \left(\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})\right)\right) \\
+    =& \sum_{i=1}^n \delta_i\left(\sum_{s=1}^p x_{i,s}(t_i)\beta_s - \ln \left(\sum_{j\in R(t_i)} \exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right)\right)\right) \\
+\end{align*}
+
+Let
+\[g(\boldsymbol{\beta}) = \sum_{j\in R(t_i)} \exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right)\]
+with derivative:
+
+\begin{align*}
+    & \frac{d}{d\beta_k}g(\boldsymbol{\beta}) \\
+    =& \frac{d}{d\beta_k}\sum_{j\in R(t_i)} \exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right) \\
+    =& \sum_{j\in R(t_i)} \left(\frac{d}{d\beta_k}\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right)\exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right) \\
+    =& \sum_{j\in R(t_i)} x_{j,k}(t_i)\exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right) \\
+\end{align*}
+
+Score:
+\begin{align*}
+    & \frac{d}{d\beta_k}\ln L(\boldsymbol{\beta}) \\
+    =& \frac{d}{d\beta_k}\sum_{i=1}^n \delta_i\left(\sum_{s=1}^p x_{i,s}(t_i)\beta_s - \ln g(\boldsymbol{\beta})\right) \\
+    =& \sum_{i=1}^n \delta_i\left(\frac{d}{d\beta_k}\sum_{s=1}^p x_{i,s}(t_i)\beta_s - \frac{d}{d\beta_k}\ln g(\boldsymbol{\beta})\right) \\
+    =& \sum_{i=1}^n \delta_i\left(x_{i,k}(t_i) - \frac{\frac{d}{d\beta_k}g(\boldsymbol{\beta})}{g(\boldsymbol{\beta})}\right) \\
+    =& \sum_{i=1}^n \delta_i\left(x_{i,k}(t_i) - \frac{\sum_{j\in R(t_i)} x_{j,k}(t_i)\exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right)}{\sum_{j\in R(t_i)} \exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right)}\right) \\
+    =& \sum_{i=1}^n \delta_i\left(x_{i,k}(t_i) - \frac{\sum_{j\in R(t_i)} x_{j,k}(t_i)\exp\left(\mathbf{x}_j(t_i)^\top \boldsymbol{\beta}\right)}{\sum_{j\in R(t_i)} \exp\left(\mathbf{x}_j(t_i)^\top \boldsymbol{\beta}\right)}\right) \\
+\end{align*}
 
 # D.3.
 
