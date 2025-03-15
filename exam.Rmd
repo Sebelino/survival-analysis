@@ -172,7 +172,24 @@ Thus, our initial assumption is incorrect.
 It is not possible to express the tuple \((t_i,u_i,v_i)\)
 using the `Surv` function.
 
+<!-- TODO Argument can prolly be made more solid -->
+
 # C.1.
+
+\begin{align*}
+    & P(T>t \,|\, T>t_0) \\
+    =& \frac{P(\{T>t\} \cap \{T>t_0\})}{P(T>t_0)} \\
+    =& \frac{P(T > \max(t_0,t))}{P(T>t_0)} \\
+    =& \begin{cases}\frac{P(T > t)}{P(T>t_0)} \text{ if }t_0\leq t \\ \frac{P(T > t_0)}{P(T>t_0)} \text{ if }t_0>t\end{cases} \\
+    =& \frac{P(T > t)}{P(T>t_0)}𝟙_{t_0\leq t} + \frac{P(T > t_0)}{P(T>t_0)}𝟙_{t_0> t} \\
+    =& \frac{P(T > t)}{P(T>t_0)}𝟙_{t_0\leq t} + 𝟙_{t_0> t} \\
+    =& \frac{P(T > t)}{P(T>t_0)}𝟙_{t_0\leq t} + 1-𝟙_{t_0\leq  t} \\
+    =& \left(\frac{P(T > t)}{P(T>t_0)}-1\right)𝟙_{t_0\leq  t}+1 \\
+    =& \left(\frac{S(t)}{S(t_0)}-1\right)𝟙_{t_0\leq  t}+1 \\
+\end{align*}
+
+If \(t_0\leq t\), the expression simplifies to:
+\[P(T>t \,|\, T>t_0) = \frac{S(t)}{S(t_0)}\]
 
 # C.2.
 
