@@ -208,6 +208,27 @@ With this formula, and with \(t=Q(p\,|\,t_0)\), we get:
 
 # C.3.
 
+We can rewrite the previous formula for \(Q(p\,|\,t_0)\) using the CDF:
+\[Q(p\,|\,t_0) = Q(1-(1-p)(1-F_T(t_0)))\]
+Given \(T\sim \text{LogNormal}(\mu,\sigma^2)\), `plnorm(t0,mu,sigma)` computes
+\(F_T(t_0)\), and `qlnorm(q,mu,sigma)` computes \(Q(q)\).
+
+We can therefore compute \(Q(t|t_0)\) like so:
+
+```{r}
+p <- 0.4
+t0 <- 2
+mu <- 1
+sigma <- 1.2
+
+cdf_t0 <- plnorm(t0, meanlog=mu, sdlog=sigma)
+prob <- 1-(1-p)*(1-cdf_t0)
+qlnorm(prob, meanlog=mu, sdlog=sigma)
+```
+
+Thus:
+\[Q(0.4\,|\,2) = Q(1-(1-0.4)(1-F_T(2))) \approx 4.2\]
+
 # C.4.
 
 # D.1.
