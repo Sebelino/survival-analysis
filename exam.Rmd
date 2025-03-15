@@ -319,6 +319,26 @@ Score:
 
 # D.3.
 
+For the Cox proportional hazards model with time-varying effects, the hazard of individual \(i\) at time \(t\) is given by:
+\[h(t|\mathbf{x}) = h_0(t)\exp(\boldsymbol{\beta}^\top \mathbf{x}_i(t))\]
+
+In this case, we know that \(\mathbf{x}_i(t) = (z_i,z_i t)\) where \(z_i\in\{0,1\}\). Let the corresponding coefficients be \(\boldsymbol{\beta} = (\beta_1,\beta_2)\).
+
+\begin{align*}
+    & h(t|\mathbf{x}) \\
+    =& h_0(t)\exp(\boldsymbol{\beta}^\top \mathbf{x}_i(t)) \\
+    =& h_0(t)\exp\left(\begin{bmatrix}\beta_1 & \beta_2\end{bmatrix}\begin{bmatrix}z_i \\ z_i t\end{bmatrix}\right) \\
+    =& h_0(t)\exp\left(\beta_1 z_i + \beta_2 z_i t\right) \\
+\end{align*}
+
+Hazard ratio:
+
+\begin{align*}
+    & \frac{h(t|(1,t))}{h(t|(0,0))} \\
+    =& \frac{h_0(t)\exp\left(\beta_1 \cdot 1 + \beta_2 \cdot 1 t\right)}{h_0(t)\exp\left(\beta_1 \cdot 0 + \beta_2 \cdot 0 \cdot t\right)} \\
+    =& \exp\left(\beta_1 + \beta_2 t\right) \\
+\end{align*}
+
 # D.4.
 
 # E.1.
