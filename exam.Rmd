@@ -68,7 +68,54 @@ a positive \(\beta\) implies a negative \(\tilde{\beta}\).
 
 # B.1.
 
+Let \(T\) be the survival time of an individual,
+so that \(S(t) = P(T>t)\).
 
+## a)
+
+For individual \(i\),
+we know that the event was observed in the interval \((u_i,v_i]\),
+which means \(u_i < T_i \leq v_i\). Furthermore,
+the event is only observed if \(T_i > t_i\), so we need to
+condition on \(T_i>t_i\).
+The likelihood contribution for a single data tuple \((t_i,u_i,v_i)\) is:
+\begin{align*}
+    & P(u_i < T_i \leq v_i \, | \, T_i > t_i) \\
+    =& \frac{P(\{u_i < T_i \leq v_i\} \cap \{T_i > t_i\})}{P(T_i > t_i)} \\
+    =& \frac{P(\max(t_i,u_i) < T_i \leq v_i)}{P(T_i > t_i)} \\
+    =& \frac{P(u_i < T_i \leq v_i)}{P(T_i > t_i)} \\
+    =& \frac{F_{T_i}(v_i)-F_{T_i}(u_i)}{P(T_i > t_i)} \\
+    =& \frac{1-S(v_i)-(1-S(u_i))}{S(t_i)} \\
+    =& \frac{S(u_i)-S(v_i)}{S(t_i)} \\
+\end{align*}
+
+Log-likelihood contribution for individual \(i\):
+\begin{align*}
+    & \ell_i \\
+    =& \ln\frac{S(u_i)-S(v_i)}{S(t_i)} \\
+    =& \ln(S(u_i) - S(v_i)) - \ln S(t_i) \\
+\end{align*}
+
+Log-likelihood contribution for \(n\) individuals:
+\begin{align*}
+    & \ell_{1:n} \\
+    =& \ln\prod_{i=1}^n \frac{S(u_i)-S(v_i)}{S(t_i)} \\
+    =& \sum_{i=1}^n \left(\ln(S(u_i) - S(v_i)) - \ln S(t_i)\right) \\
+\end{align*}
+
+## b)
+
+\begin{align*}
+    & \ell_i \\
+    =& \ln(S(u_i) - S(v_i)) - \ln S(t_i) \\
+    =& \ln\left(S(u_i) - S(u_i)\exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right) - \ln S(t_i) \\
+    =& \ln\left(S(u_i)\left(1 - \exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right)\right) - \ln S(t_i) \\
+    =& \ln S(u_i) + \ln\left(1 - \exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right) - \ln S(t_i) \\
+    =& \ln \exp\left(-\int_0^{u_i} h(t)dt\right) + \ln\left(1 - \exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right) - \ln \exp\left(-\int_0^{t_i} h(t)dt\right) \\
+    =& -\int_0^{u_i} h(t)dt + \ln\left(1 - \exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right) +\int_0^{t_i} h(t)dt \\
+    =& \ln\left(1 - \exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right) - \int_{t_i}^{u_i} h(t)dt
+
+\end{align*}
 
 # B.2.
 
