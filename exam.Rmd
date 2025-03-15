@@ -140,7 +140,7 @@ using the `Surv` function.
 Then it is possible to do so by
 a function call of the form:
 ```{r, eval=FALSE}
-Surv(time=a, time2=b, event=c, type=d, origin=e)
+Surv(time = a, time2 = b, event = c, type = d, origin = e)
 ```
 Since $t_i$, $u_i$, and $v_i$ are arbitrary numbers,
 we cannot pass them to the function via the `event` or `type` arguments.
@@ -223,9 +223,9 @@ t0 <- 2
 mu <- 1
 sigma <- 1.2
 
-cdf_t0 <- plnorm(t0, meanlog=mu, sdlog=sigma)
-prob <- 1-(1-p)*(1-cdf_t0)
-qlnorm(prob, meanlog=mu, sdlog=sigma)
+cdf_t0 <- plnorm(t0, meanlog = mu, sdlog = sigma)
+prob <- 1 - (1 - p) * (1 - cdf_t0)
+qlnorm(prob, meanlog = mu, sdlog = sigma)
 ```
 
 Thus:
@@ -241,11 +241,12 @@ Thus:
 #' @param sdlog sd on the log scale
 #' @param t0 left truncation time(s)
 #' @return vector of random numbers drawn from a truncated log-normal distribution
-rtrunc_lnorm = function(n, meanlog, sdlog, t0) {
-    y = rlnorm(n, meanlog, sdlog)
-    while (any(y<t0))
-        y[y<t0] = rlnorm(n, meanlog, sdlog)[y<t0]
-    y
+rtrunc_lnorm <- function(n, meanlog, sdlog, t0) {
+  y <- rlnorm(n, meanlog, sdlog)
+  while (any(y < t0)) {
+    y[y < t0] <- rlnorm(n, meanlog, sdlog)[y < t0]
+  }
+  y
 }
 
 p <- 0.4
@@ -340,6 +341,58 @@ Hazard ratio:
 \end{align*}
 
 # D.4.
+
+Let
+\[\mathbf{x}(t) = (\text{stage}_{\text{Unk}},\text{stage}_{\text{Reg}},\text{stage}_{\text{Dis}},\text{stage}_{\text{Dis}} \cdot t)\]
+where each \(\text{stage}_{i} \in \{0,1\}\).
+
+Regression model:
+
+\[\ln h(t|\mathbf{x}) = \ln h_0(t) + \beta_{\text{Unk}} \text{stage}_{\text{Unk}} + \beta_{\text{Reg}}\text{stage}_{\text{Reg}} + \beta_{tt}\text{stage}_{\text{Dis}} t\]
+
+The coefficients
+\(\beta_{\text{Unk}}\),
+\(\beta_{\text{Reg}}\),
+\(\beta_{\text{Dis}}\) are
+log-hazard ratios for the respective stages, relative
+to the reference stage "Localised", at time \(t=0\).
+
+\(\beta_tt\) is the change in the log-hazard ratio for the "Distant" stage (relative to "Localised") per year increase in survival time.
+
+```{r, echo=FALSE, message=FALSE}
+library(survival)
+library(biostat3)
+```
+```{r}
+model <- coxph(Surv(surv_mm, status == "Dead: cancer") ~ stage + tt(stage),
+  data = transform(biostat3::colon, stage = relevel(stage, "Localised")),
+  tt = function(x, t, ...) (x == "Distant") * t / 12
+)
+summary(model)
+```
+
+Interpretation:
+
+* \(\beta_{\text{Unk}} \approx 0.94\) is the log-hazard ratio for the "Unknown" stage. The hazard ratio is
+\(\exp(\beta_{\text{Unk}}) \approx 2.56\).
+Meaning, the hazard for colon cancer patients in the "Unknown" stage
+is 2.56 times that of patients in the "Localised" stage.
+* \(\beta_{\text{Reg}} \approx 0.80\) is the log-hazard ratio for the "Regional" stage. The hazard ratio is
+\(\exp(\beta_{\text{Reg}}) \approx 2.23\).
+Meaning, the hazard for colon cancer patients in the "Regional" stage
+is 2.23 times that of patients in the "Localised" stage.
+* \(\beta_{\text{Dis}} \approx 2.22\) is the log-hazard ratio for the "Distant" stage. The hazard ratio is
+\(\exp(\beta_{\text{Dis}}) \approx 9.20\).
+Meaning, the hazard for colon cancer patients in the "Distant" stage
+is 9.20 times that of patients in the "Localised" stage at time \(t=0\).
+* \(\beta_{tt} \approx -0.12\) is the per-year change in the log-hazard ratio for "Distant" vs. "Localised".
+The corresponding change in hazard ratio is
+\(\exp(\beta_{tt}) \approx 0.88\).
+Meaning, each additional year of follow-up
+multiplies the hazard ratio for "Distant" vs. "Localised" by
+about 0.88.
+In other words, the hazard ratio for "Distant" vs. "Localised"
+decreases by about 12 % each year after \(t=0\).
 
 # E.1.
 
