@@ -195,7 +195,7 @@ If \(t_0\leq t\), the expression simplifies to:
 
 We know that \(Q(q) = S^{-1}(1-q)\) for any \(q\). Equivalently,
 \(Q(1-q) = S^{-1}(1-(1-q)) = S^{-1}(q)\).
-With this formula, and with \(t=Q(p\,|\,t_0)\), we get:
+With this formula, and with \(t=Q(p\,|\,t_0)\) and assuming \(t_0\leq t\), we get:
 
 \begin{align*}
     & P(T> t \,|\, T>t_0) = 1-p \\
@@ -205,6 +205,8 @@ With this formula, and with \(t=Q(p\,|\,t_0)\), we get:
     \Rightarrow& Q(p\,|\,t_0) = S^{-1}((1-p)S(t_0)) \\
     \Rightarrow& Q(p\,|\,t_0) = Q(1-(1-p)S(t_0))  \\
 \end{align*}
+
+<!-- Not accounting for t0>t -->
 
 # C.3.
 
@@ -229,7 +231,40 @@ qlnorm(prob, meanlog=mu, sdlog=sigma)
 Thus:
 \[Q(0.4\,|\,2) = Q(1-(1-0.4)(1-F_T(2))) \approx 4.2\]
 
+<!-- Not accounting for t0>t -->
+
 # C.4.
+
+```{r}
+#' @param n the number of random numbers
+#' @param meanlog mean on the log scale
+#' @param sdlog sd on the log scale
+#' @param t0 left truncation time(s)
+#' @return vector of random numbers drawn from a truncated log-normal distribution
+rtrunc_lnorm = function(n, meanlog, sdlog, t0) {
+    y = rlnorm(n, meanlog, sdlog)
+    while (any(y<t0))
+        y[y<t0] = rlnorm(n, meanlog, sdlog)[y<t0]
+    y
+}
+
+p <- 0.4
+t0 <- 2
+mu <- 1
+sigma <- 1.2
+n <- 1e6
+
+set.seed(7)
+sample <- rtrunc_lnorm(n, mu, sigma, t0)
+quantile(sample, probs = p)
+```
+
+With a sufficiently large sample size (\(n=10^6\)),
+wee see that
+`quantile` gives
+us an empirical 40th percentile which is approximately equal to
+our value in C3:
+\[4.178294 \approx 4.171994\]
 
 # D.1.
 
