@@ -193,6 +193,19 @@ If \(t_0\leq t\), the expression simplifies to:
 
 # C.2.
 
+We know that \(Q(q) = S^{-1}(1-q)\) for any \(q\). Equivalently,
+\(Q(1-q) = S^{-1}(1-(1-q)) = S^{-1}(q)\).
+With this formula, and with \(t=Q(p\,|\,t_0)\), we get:
+
+\begin{align*}
+    & P(T> t \,|\, T>t_0) = 1-p \\
+    \Rightarrow& \frac{S(t)}{S(t_0)} = 1-p \\
+    \Rightarrow& S(t) = (1-p)S(t_0) \\
+    \Rightarrow& S(Q(p\,|\,t_0)) = (1-p)S(t_0) \\
+    \Rightarrow& Q(p\,|\,t_0) = S^{-1}((1-p)S(t_0)) \\
+    \Rightarrow& Q(p\,|\,t_0) = Q(1-(1-p)S(t_0))  \\
+\end{align*}
+
 # C.3.
 
 # C.4.
