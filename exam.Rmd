@@ -540,6 +540,25 @@ to be a valid measure of the effect of hormonal therapy on survival.
 
 # E.4.
 
+We can plot the Schoenfeld residuals against time to visually
+inspect the proportional hazards assumption.
+If the assumption is met, the residuals for the `hormon`
+covariate should show no systematic trend over time, i.e. no slope.
+If there is a time-dependent effect, we might see a non-horizontal
+pattern in the residuals.
+
+```{r}
+plot(ph_test)
+```
+<div style="text-align: center;">
+*Figure 2: Residuals for \(\beta_{\text{hormon}}\).*
+</div>
+
+The Loess-smoothed curve in Figure 2 resembles a horizontal line,
+and the confidence band does not substantially deviate from it.
+This suggests that there is no strong evidence that the hazard
+ratio changes over time, making the proportional hazards assumption valid.
+
 # F.1.
 
 # F.2.
