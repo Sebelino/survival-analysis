@@ -511,6 +511,33 @@ significant.
 
 # E.3.
 
+The Cox model assumes that the effect of hormonal treatment
+on the hazard is constant over time.
+The Schoenfeld residuals should then have no correlation with time
+if the proportional hazards assumption holds.
+
+We perform a Schoenfeld residual test:
+
+```{r}
+ph_test <- cox.zph(cox_model)
+ph_test
+```
+
+Since \(p=0.63\), we fail to reject the null hypothesis that
+the proportional hazards assumption holds for the hormonal treatment
+variable.
+Meaning, there is no significant evidence that the effect of hormonal
+treatment changes over time.
+Hence, the proprtional hazards assumption appears to be satisfied,
+making the Cox model suitable.
+We can therefore trust the hazard ratio estimate we found earlier
+to be a valid measure of the effect of hormonal therapy on survival.
+
+<!-- TODO Why not model for time-varying hazard ratio + LR test? -->
+<!-- Motivate scaled vs. unscaled Schoenfeld residuals -->
+<!-- Motivate identity transformation -->
+<!-- cox.pdf slide 43 suggests making a plot -->
+
 # E.4.
 
 # F.1.
