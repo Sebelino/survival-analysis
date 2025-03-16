@@ -559,6 +559,10 @@ and the confidence band does not substantially deviate from it.
 This suggests that there is no strong evidence that the hazard
 ratio changes over time, making the proportional hazards assumption valid.
 
+<!-- TODO balanced motivation? -->
+
 # F.1.
+
+
 
 # F.2.
