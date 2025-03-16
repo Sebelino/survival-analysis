@@ -431,7 +431,7 @@ Figure 1 shows the following:
 * The probability of survival decreases over time for both arms,
 indicating that the risk of breast cancer recurrence increases with longer
 follow-up.
-* The curve for the treatment group (`hormon=1`) is consistently above the
+* The curve for the experimental group (`hormon=1`) is consistently above the
 curve for the control group (`hormon=0`), indicating that patients receiving hormonal therapy tend to have higher
 survival probabilities throughout the follow-up period compared to those
 who did not receive hormonal therapy.
@@ -445,7 +445,7 @@ increased uncertainty due to fewer patients remaining in the study.
 * The curve for the control group includes a steep vertical jump toward the end, indicating
 that the number of patients at risk in this group is in the single-digits
 at this point in time.
-* There seem to be a sudden drop in survival for the treatment group at around
+* There seem to be a sudden drop in survival for the experimental group at around
 2000 days. One explanation is that the effect of hormonal therapy on survival
 diminishes after around 2000 days.
 But this could also be coincidental --
@@ -524,11 +524,11 @@ ph_test
 ```
 
 Since \(p=0.63\), we fail to reject the null hypothesis that
-the proportional hazards assumption holds for the hormonal treatment
+the proportional hazards assumption holds for the hormonal therapy treatment
 variable.
 Meaning, there is no significant evidence that the effect of hormonal
 treatment changes over time.
-Hence, the proprtional hazards assumption appears to be satisfied,
+Hence, the proportional hazards assumption appears to be satisfied,
 making the Cox model suitable.
 We can therefore trust the hazard ratio estimate we found earlier
 to be a valid measure of the effect of hormonal therapy on survival.
@@ -563,6 +563,45 @@ ratio changes over time, making the proportional hazards assumption valid.
 
 # F.1.
 
+The estimand of interest is the cause-specific hazard ratio for
+death due to colorectal cancer over five years of follow up,
+comparing the low-dose aspirin arm to the control arm.
 
+\[\text{HR} = \frac{h(t|A=1)}{h(t|A=0)}\]
+
+To find a suitable estimator, the standard approach is to
+assume proportional hazards and
+start off with a Cox proportional hazards model.
+
+\[h(t|A,X) = h_0(t)\exp(\beta A + \gamma X)\]
+
+Since this is a randomized controlled trial,
+the values of explanatory variables should be balanced between
+treatment groups. Hence,
+on average, both measured and unmeasured confounders should be equally
+distributed across treatment groups, and
+confounding is expected to be minimal.
+
+However, it is possible that the sample size is too small.
+Hence, some confounders may sitll be unevenly distributed by chance.
+
+If strong imbalances exist, stratify on key variables rather
+than adjusting them as covariates.
+Switch to a stratified Cox model.
+
+If proportional hazards are violated, use time-dependent
+Cox models, or consider RMST analysis as an alternative.
 
 # F.2.
+
+It is helpful if the model is collapsible, so that the
+marginal estimate without the unmeasured covariates is the same
+parameter as the conditional estimate.
+
+Cox proportional hazards model is non-collapsible.
+Aalen's additive model is collapsible.
+
+Non-collapsibility is less of an issue with (i) rare events and (ii)
+a small frailty.
+
+<!-- TODO lecture_miscel.pdf slide 33 -->
