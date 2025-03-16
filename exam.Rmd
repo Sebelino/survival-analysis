@@ -350,6 +350,7 @@ Regression model:
 
 \[\ln h(t|\mathbf{x}) = \ln h_0(t) + \beta_{\text{Unk}} \text{stage}_{\text{Unk}} + \beta_{\text{Reg}}\text{stage}_{\text{Reg}} + \beta_{tt}\text{stage}_{\text{Dis}} t\]
 
+\(h_0\) denotes the baseline hazards function.
 The coefficients
 \(\beta_{\text{Unk}}\),
 \(\beta_{\text{Reg}}\),
@@ -373,26 +374,29 @@ summary(model)
 
 Interpretation:
 
-* \(\beta_{\text{Unk}} \approx 0.94\) is the log-hazard ratio for the "Unknown" stage. The hazard ratio is
+* \(\beta_{\text{Unk}} \approx 0.94\) is the estimated log-hazard ratio for the "Unknown" stage. The estimated hazard ratio is
 \(\exp(\beta_{\text{Unk}}) \approx 2.56\).
 Meaning, the hazard for colon cancer patients in the "Unknown" stage
 is 2.56 times that of patients in the "Localised" stage.
-* \(\beta_{\text{Reg}} \approx 0.80\) is the log-hazard ratio for the "Regional" stage. The hazard ratio is
+* \(\beta_{\text{Reg}} \approx 0.80\) is the estimated log-hazard ratio for the "Regional" stage. The estimated hazard ratio is
 \(\exp(\beta_{\text{Reg}}) \approx 2.23\).
-Meaning, the hazard for colon cancer patients in the "Regional" stage
+Meaning, the estimated hazard for colon cancer patients in the "Regional" stage
 is 2.23 times that of patients in the "Localised" stage.
-* \(\beta_{\text{Dis}} \approx 2.22\) is the log-hazard ratio for the "Distant" stage. The hazard ratio is
+* \(\beta_{\text{Dis}} \approx 2.22\) is the estimated log-hazard ratio for the "Distant" stage. The estimated hazard ratio is
 \(\exp(\beta_{\text{Dis}}) \approx 9.20\).
-Meaning, the hazard for colon cancer patients in the "Distant" stage
+Meaning, the estimated hazard for colon cancer patients in the "Distant" stage
 is 9.20 times that of patients in the "Localised" stage at time \(t=0\).
-* \(\beta_{tt} \approx -0.12\) is the per-year change in the log-hazard ratio for "Distant" vs. "Localised".
-The corresponding change in hazard ratio is
+* \(\beta_{tt} \approx -0.12\) is the estimated per-year change in the log-hazard ratio for "Distant" vs. "Localised".
+The corresponding estimaed change in hazard ratio is
 \(\exp(\beta_{tt}) \approx 0.88\).
 Meaning, each additional year of follow-up
 multiplies the hazard ratio for "Distant" vs. "Localised" by
 about 0.88.
 In other words, the hazard ratio for "Distant" vs. "Localised"
 decreases by about 12 % each year after \(t=0\).
+
+The p-value of each coefficient is well below \(0.05\),
+indicating very strong statistical significance.
 
 # E.1.
 
@@ -452,7 +456,54 @@ suggesting strong evidence against the null hypothesis that hormonal therapy
 has no effect on survival. There is strong evidence that hormonal therapy
 is associated with an improvement in recurrence-free survival.
 
+<!-- TODO Switch from days -> years? That's what he does in his examples -->
+
 # E.2.
+
+We are interested in learning whether hormonal therapy has
+an effect on the survival of breast cancer patients, and the magnitude
+of the effect.
+A Cox proportional hazards model is appropriate if we
+assume proportional hazards for the two groups over time.
+Our estimand of choice is therefore the hazard ratio of
+hormonal therapy treatment vs. no treatment.
+
+Let \(\text{hormon}=1\) if the subject received hormonal therapy and
+\(\text{hormon}=0\) otherwise.
+Let \(\beta_{\text{hormon}}\) be the corresponding regression coefficient.
+
+Let \(h(t|\text{hormon})\) denote the hazard at time \(t\).
+\(h_0(t)\) is the baseline hazard (when \(\text{hormon}=0\)).
+
+Regression model:
+
+\[h(t|\text{hormon}) = h_0(t)\exp(\beta_{\text{hormon}} \text{hormon})\]
+
+Fitting the regression model:
+
+```{r}
+cox_model <- coxph(surv_object ~ hormon, data = brcancer)
+summary(cox_model)
+```
+Hazard ratio for `hormon=1` vs. `hormon=0`:
+```{r}
+exp(coef(cox_model))
+```
+95 % confidence interval:
+```{r}
+exp(confint(cox_model))
+```
+The estimate of the hazard ratio is 0.69, with a 95 % CI of [0.54, 0.89].
+This indicates that hormonal therapy lowers the hazard by around 31 %
+compared to lack of treatment.
+The confidence interval does not include 1 and the p-value is
+significant at \(p=0.0036 < 0.05\),
+indicating that the effect is statistically
+significant.
+
+<!-- TODO Should I include other covariates? -->
+<!-- https://cran.r-project.org/web/packages/rstpm2/vignettes/SimpleGuide.pdf -->
+<!-- https://cran.r-project.org/web/packages/rstpm2/vignettes/Introduction.pdf -->
 
 # E.3.
 
