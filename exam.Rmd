@@ -479,6 +479,9 @@ Regression model:
 
 \[h(t|\text{hormon}) = h_0(t)\exp(\beta_{\text{hormon}} \text{hormon})\]
 
+In this model, \(\beta_{\text{hormon}}\) is a log-hazard ratio,
+so our estimand of interest is \(\exp(\beta_{\text{hormon}})\).
+
 Fitting the regression model:
 
 ```{r}
@@ -493,10 +496,11 @@ exp(coef(cox_model))
 ```{r}
 exp(confint(cox_model))
 ```
-The estimate of the hazard ratio is 0.69, with a 95 % CI of [0.54, 0.89].
+The estimate of the hazard ratio is
+\(\exp(\hat{\beta}_{\text{hormon}}) \approx 0.69\), with a 95 % CI of [0.54, 0.89].
 This indicates that hormonal therapy lowers the hazard by around 31 %
 compared to lack of treatment.
-The confidence interval does not include 1 and the p-value is
+The confidence interval does not include 1, and the p-value is
 significant at \(p=0.0036 < 0.05\),
 indicating that the effect is statistically
 significant.
