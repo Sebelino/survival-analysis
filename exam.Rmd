@@ -396,6 +396,62 @@ decreases by about 12 % each year after \(t=0\).
 
 # E.1.
 
+```{r, message=FALSE}
+library(survival)
+library(survminer)
+library(rstpm2)
+```
+```{r}
+data(brcancer)
+surv_object <- Surv(time = brcancer$rectime, event = brcancer$censrec)
+km_fit <- survfit(surv_object ~ hormon, conf.type="log-log", data = brcancer)
+ggsurvplot(
+  km_fit,
+  data = brcancer,
+  pval = TRUE,
+  risk.table = FALSE,
+  conf.int = TRUE,
+  legend.labs = c("No hormonal therapy", "Hormonal therapy"),
+  legend.title = "Randomization arm",
+  xlab = "Time (days)",
+  ylab = "Survival probability",
+  title = "Kaplan-Meier survival curves by randomization arm"
+)
+```
+<div style="text-align: center;">
+*Figure 1: Kaplan-Meier curves by randomization arm.*
+</div>
+
+Figure 1 shows the following:
+
+* The probability of survival decreases over time for both arms,
+indicating that the risk of breast cancer recurrence increases with longer
+follow-up.
+* The curve for the treatment group (`hormon=1`) is consistently above the
+curve for the control group (`hormon=0`), indicating that patients receiving hormonal therapy tend to have higher
+survival probabilities throughout the follow-up period compared to those
+who did not receive hormonal therapy.
+* The curves do not intersect and appear to maintain a consistent separation
+over time, possibly suggesting proportional hazards.
+* The difference in survival probabilities appears to be the most pronounced
+in the period from ~1300 to ~2000 days, where the 95 % confidence intervals
+overlap minimally.
+* The confidence intervals are wider at later timepoints, reflecting
+increased uncertainty due to fewer patients remaining in the study.
+* The curve for the control group includes a steep vertical jump toward the end, indicating
+that the number of patients at risk in this group is in the single-digits
+at this point in time.
+* There seem to be a sudden drop in survival for the treatment group at around
+2000 days. One explanation is that the effect of hormonal therapy on survival
+diminishes after around 2000 days.
+But this could also be coincidental --
+as the study approaches later time points, random variation plays
+a bigger role because fewer patients remain in the risk set.
+* The p-value of the log-rank test is \(p=0.0034 < 0.05\),
+suggesting strong evidence against the null hypothesis that hormonal therapy
+has no effect on survival. There is strong evidence that hormonal therapy
+is associated with an improvement in recurrence-free survival.
+
 # E.2.
 
 # E.3.
@@ -405,9 +461,3 @@ decreases by about 12 % each year after \(t=0\).
 # F.1.
 
 # F.2.
-
-
-```{r, message=FALSE}
-library(biostat3) # colon
-library(dplyr)
-```
