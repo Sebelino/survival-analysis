@@ -4,11 +4,19 @@ output:
   prettydoc::html_pretty:
     theme: cayman
     highlight: github
+  pdf_document:
+    latex_engine: xelatex
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+csl: vancouver-brackets.csl
 ---
 
 # AI disclosure
 
-ChatGPT was used to review my solutions and for grammar and clarity checks.
+ChatGPT was used to review my solutions and for grammar and clarity
+checks.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, comment = "")
@@ -16,10 +24,10 @@ knitr::opts_chunk$set(echo = TRUE, comment = "")
 
 # A.1.
 
-Let \(\lambda_1 = \lambda\exp(\beta x)\).
-Then the proportional hazards model has a survival time function
-of the form:
+Let $\lambda_1 = \lambda\exp(\beta x)$. Then the proportional hazards
+model has a survival time function of the form:
 
+```{=tex}
 \begin{align*}
     & S(t|x) \\
     =& S_0(t)^{\exp(\beta x)} \\
@@ -28,17 +36,16 @@ of the form:
     =& \exp(-\lambda\exp(\beta x) t^k) \\
     =& \exp(-\lambda_1 t^k) \\
 \end{align*}
-
-which has the form of a Weibull distribution
-with shape parameter $k$ and scale parameter
-\(\lambda_1 = \lambda\exp(-k\tilde{\beta} x)\).
+```
+which has the form of a Weibull distribution with shape parameter $k$
+and scale parameter $\lambda_1 = \lambda\exp(-k\tilde{\beta} x)$.
 
 # A.2.
 
-Let \(\lambda_2 = \lambda\exp(-k\tilde{\beta} x)\).
-Then the accelerated survival time model has a survival time function
-of the form:
+Let $\lambda_2 = \lambda\exp(-k\tilde{\beta} x)$. Then the accelerated
+survival time model has a survival time function of the form:
 
+```{=tex}
 \begin{align*}
     & S(t|x) \\
     =& S_0(t \exp(-\tilde{\beta} x)) \\
@@ -48,37 +55,30 @@ of the form:
     =& \exp(-\lambda\exp(-k\tilde{\beta} x) t^k) \\
     =& \exp(-\lambda_2 t^k ) \\
 \end{align*}
-
-which has the form of a Weibull distribution
-with shape parameter $k$ and scale parameter
-\(\lambda_2 = \lambda\exp(-k\tilde{\beta} x)\).
+```
+which has the form of a Weibull distribution with shape parameter $k$
+and scale parameter $\lambda_2 = \lambda\exp(-k\tilde{\beta} x)$.
 
 # A.3.
 
 Proportional hazards model survival function:
-\[\exp(-\lambda\exp(\beta x) t^k)\]
-Accelerated survival time model survival function:
-\[\exp(-\lambda\exp(-k\tilde{\beta} x) t^k)\]
-We see that the survival functions are equal if
-the log hazard ratio is related to the log time ratio like so:
-\[\beta = -k\tilde{\beta}\]
-Given that the shape parameter \(k\) is positive,
-this means
-a positive \(\beta\) implies a negative \(\tilde{\beta}\).
+$$\exp(-\lambda\exp(\beta x) t^k)$$ Accelerated survival time model
+survival function: $$\exp(-\lambda\exp(-k\tilde{\beta} x) t^k)$$ We see
+that the survival functions are equal if the log hazard ratio is related
+to the log time ratio like so: $$\beta = -k\tilde{\beta}$$ Given that
+the shape parameter $k$ is positive, this means a positive $\beta$
+implies a negative $\tilde{\beta}$.
 
 # B.1.
 
-Let \(T\) be the survival time of an individual,
-so that \(S(t) = P(T>t)\).
+Let $T$ be the survival time of an individual, so that $S(t) = P(T>t)$.
 
 ## a)
 
-For individual \(i\),
-we know that the event was observed in the interval \((u_i,v_i]\),
-which means \(u_i < T_i \leq v_i\). Furthermore,
-the event is only observed if \(T_i > t_i\), so we need to
-condition on \(T_i>t_i\).
-The likelihood contribution for a single data tuple \((t_i,u_i,v_i)\) is:
+For individual $i$, we know that the event was observed in the interval
+$(u_i,v_i]$, which means $u_i < T_i \leq v_i$. Furthermore, the event is
+only observed if $T_i > t_i$, so we need to condition on $T_i>t_i$. The
+likelihood contribution for a single data tuple $(t_i,u_i,v_i)$ is:
 \begin{align*}
     & P(u_i < T_i \leq v_i \, | \, T_i > t_i) \\
     =& \frac{P(\{u_i < T_i \leq v_i\} \cap \{T_i > t_i\})}{P(T_i > t_i)} \\
@@ -89,15 +89,13 @@ The likelihood contribution for a single data tuple \((t_i,u_i,v_i)\) is:
     =& \frac{S(u_i)-S(v_i)}{S(t_i)} \\
 \end{align*}
 
-Log-likelihood contribution for individual \(i\):
-\begin{align*}
+Log-likelihood contribution for individual $i$: \begin{align*}
     & \ell_i \\
     =& \ln\frac{S(u_i)-S(v_i)}{S(t_i)} \\
     =& \ln(S(u_i) - S(v_i)) - \ln S(t_i) \\
 \end{align*}
 
-Log-likelihood contribution for \(n\) individuals:
-\begin{align*}
+Log-likelihood contribution for $n$ individuals: \begin{align*}
     & \ell_{1:n} \\
     =& \ln\prod_{i=1}^n \frac{S(u_i)-S(v_i)}{S(t_i)} \\
     =& \sum_{i=1}^n \left(\ln(S(u_i) - S(v_i)) - \ln S(t_i)\right) \\
@@ -105,8 +103,7 @@ Log-likelihood contribution for \(n\) individuals:
 
 ## b)
 
-Log-likelihood contribution for individual \(i\):
-\begin{align*}
+Log-likelihood contribution for individual $i$: \begin{align*}
     & \ell_i \\
     =& \ln(S(u_i) - S(v_i)) - \ln S(t_i) \\
     =& \ln\left(S(u_i) - S(u_i)\exp\left(-\int_{u_i}^{v_i} h(t)dt\right)\right) - \ln S(t_i) \\
@@ -125,57 +122,60 @@ Log-likelihood contribution for individual \(i\):
 library(survival)
 ```
 
-According to the documentation [REF] and source code [REF]
-for version `3.8-3` of the package,
-the function takes the following arguments:
+According to the documentation [@survfun] and source code [@survivala]
+for version `3.8-3` of the package, the function takes the following
+arguments:
 
-* `time`: Number.
-* `time2`: Number.
-* `event`: Either 0, 1, 2, 3, TRUE or FALSE.
-* `type`: Any of the strings: `'right'`, `'left'`, `'interval'`, `'counting'`, `'interval2'`, `'mstate'`.
-* `origin`: Number.
+-   `time`: Number.
+-   `time2`: Number.
+-   `event`: Either 0, 1, 2, 3, TRUE or FALSE.
+-   `type`: Any of the strings: `'right'`, `'left'`, `'interval'`,
+    `'counting'`, `'interval2'`, `'mstate'`.
+-   `origin`: Number.
 
-Let us assume that it is possible to express the tuple \((t_i,u_i,v_i)\)
-using the `Surv` function.
-Then it is possible to do so by
-a function call of the form:
+Let us assume that it is possible to express the tuple $(t_i,u_i,v_i)$
+using the `Surv` function. Then it is possible to do so by a function
+call of the form:
+
 ```{r, eval=FALSE}
 Surv(time = a, time2 = b, event = c, type = d, origin = e)
 ```
-Since $t_i$, $u_i$, and $v_i$ are arbitrary numbers,
-we cannot pass them to the function via the `event` or `type` arguments.
-Hence, $t_i$, $u_i$, and $v_i$
-can only be passed to the function using the
-`time`, `time2`, and `origin` arguments.
 
-Further, it is reasonable to presume that
-$t_i$, $u_i$, and $v_i$ are passed to the function
-via the `time`, `time2`, and `origin` arguments in a bijective manner.
-That is, the `Surv` function is not implemented in a way such that,
-for example, the data contained in the $t_i$ and $u_i$ values are cleverly encoded together so they can be passed using a single argument, e.g. `time`.
+Since $t_i$, $u_i$, and $v_i$ are arbitrary numbers, we cannot pass them
+to the function via the `event` or `type` arguments. Hence, $t_i$,
+$u_i$, and $v_i$ can only be passed to the function using the `time`,
+`time2`, and `origin` arguments.
 
-However, according to the documentation and source code,
-the `origin` argument simply shifts the time scale,
-by subtracting from `time` and `time2`.
-Left truncation requires `type='counting'` which
-does not allow for interval censoring.
-On the other hand, interval censoring requires `type='interval'`
-which does not allow for left truncation.
-It is therefore not possible to use this argument to pass
-information regarding left truncation or interval censoring.
+Further, it is reasonable to presume that $t_i$, $u_i$, and $v_i$ are
+passed to the function via the `time`, `time2`, and `origin` arguments
+in a bijective manner. That is, the `Surv` function is not implemented
+in a way such that, for example, the data contained in the $t_i$ and
+$u_i$ values are cleverly encoded together so they can be passed using a
+single argument, e.g. `time`. A quick look at the source code supports
+this premise.
 
-Hence, we are left with only two arguments: `time` and `time2`
-for passing the three values.
-By the pigeonhole principle,
-it is not possible to pass three values using only two arguments.
-Thus, our initial assumption is incorrect.
-It is not possible to express the tuple \((t_i,u_i,v_i)\)
-using the `Surv` function.
+The documentation and source code show that the `origin` argument
+simply shifts the time scale, by subtracting from `time` and `time2`.
+Therefore, this argument cannot be used to specify left truncation or
+any of the interval endpoints. In addition, the `if` statement in the
+source code reveals that left truncation requires `type='counting'`
+which does not allow for interval censoring. On the other hand, interval
+censoring requires `type='interval'` which does not allow for left
+truncation.
+
+We are left with only two arguments (`time` and `time2`) for passing the
+three values. By the pigeonhole principle, it is not possible to pass
+three values using only two arguments. Hence, our initial assumption is
+incorrect. It is not possible to express the tuple $(t_i,u_i,v_i)$ using
+the `Surv` function.
 
 <!-- TODO Argument can prolly be made more solid -->
 
+<!-- TODO add REFERENCES -->
+
 # C.1.
 
+```{=tex}
 \begin{align*}
     & P(T>t \,|\, T>t_0) \\
     =& \frac{P(\{T>t\} \cap \{T>t_0\})}{P(T>t_0)} \\
@@ -187,16 +187,17 @@ using the `Surv` function.
     =& \left(\frac{P(T > t)}{P(T>t_0)}-1\right)𝟙_{t_0\leq  t}+1 \\
     =& \left(\frac{S(t)}{S(t_0)}-1\right)𝟙_{t_0\leq  t}+1 \\
 \end{align*}
-
-If \(t_0\leq t\), the expression simplifies to:
-\[P(T>t \,|\, T>t_0) = \frac{S(t)}{S(t_0)}\]
+```
+If $t_0\leq t$, the expression simplifies to:
+$$P(T>t \,|\, T>t_0) = \frac{S(t)}{S(t_0)}$$
 
 # C.2.
 
-We know that \(Q(q) = S^{-1}(1-q)\) for any \(q\). Equivalently,
-\(Q(1-q) = S^{-1}(1-(1-q)) = S^{-1}(q)\).
-With this formula, and with \(t=Q(p\,|\,t_0)\) and assuming \(t_0\leq t\), we get:
+We know that $Q(q) = S^{-1}(1-q)$ for any $q$. Equivalently,
+$Q(1-q) = S^{-1}(1-(1-q)) = S^{-1}(q)$. With this formula, and with
+$t=Q(p\,|\,t_0)$ and assuming $t_0\leq t$, we get:
 
+```{=tex}
 \begin{align*}
     & P(T> t \,|\, T>t_0) = 1-p \\
     \Rightarrow& \frac{S(t)}{S(t_0)} = 1-p \\
@@ -205,17 +206,17 @@ With this formula, and with \(t=Q(p\,|\,t_0)\) and assuming \(t_0\leq t\), we ge
     \Rightarrow& Q(p\,|\,t_0) = S^{-1}((1-p)S(t_0)) \\
     \Rightarrow& Q(p\,|\,t_0) = Q(1-(1-p)S(t_0))  \\
 \end{align*}
-
+```
 <!-- Not accounting for t0>t -->
 
 # C.3.
 
-We can rewrite the previous formula for \(Q(p\,|\,t_0)\) using the CDF:
-\[Q(p\,|\,t_0) = Q(1-(1-p)(1-F_T(t_0)))\]
-Given \(T\sim \text{LogNormal}(\mu,\sigma^2)\), `plnorm(t0,mu,sigma)` computes
-\(F_T(t_0)\), and `qlnorm(q,mu,sigma)` computes \(Q(q)\).
+We can rewrite the previous formula for $Q(p\,|\,t_0)$ using the CDF:
+$$Q(p\,|\,t_0) = Q(1-(1-p)(1-F_T(t_0)))$$ Given
+$T\sim \text{LogNormal}(\mu,\sigma^2)$, `plnorm(t0,mu,sigma)` computes
+$F_T(t_0)$, and `qlnorm(q,mu,sigma)` computes $Q(q)$.
 
-We can therefore compute \(Q(t|t_0)\) like so:
+We can therefore compute $Q(t|t_0)$ like so:
 
 ```{r}
 p <- 0.4
@@ -228,8 +229,7 @@ prob <- 1 - (1 - p) * (1 - cdf_t0)
 qlnorm(prob, meanlog = mu, sdlog = sigma)
 ```
 
-Thus:
-\[Q(0.4\,|\,2) = Q(1-(1-0.4)(1-F_T(2))) \approx 4.2\]
+Thus: $$Q(0.4\,|\,2) = Q(1-(1-0.4)(1-F_T(2))) \approx 4.2$$
 
 <!-- Not accounting for t0>t -->
 
@@ -260,35 +260,35 @@ sample <- rtrunc_lnorm(n, mu, sigma, t0)
 quantile(sample, probs = p)
 ```
 
-With a sufficiently large sample size (\(n=10^6\)),
-wee see that
-`quantile` gives
-us an empirical 40th percentile which is approximately equal to
-our value in C3:
-\[4.178294 \approx 4.171994\]
+With a sufficiently large sample size ($n=10^6$), wee see that
+`quantile` gives us an empirical 40th percentile which is approximately
+equal to our value in C3: $$4.178294 \approx 4.171994$$
 
 # D.1.
 
 Partial likelihood:
-\[L(\boldsymbol{\beta}) = \prod_{i=1}^n \left(\frac{\exp(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta})}{\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})}\right)^{\delta_i}\]
+$$L(\boldsymbol{\beta}) = \prod_{i=1}^n \left(\frac{\exp(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta})}{\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})}\right)^{\delta_i}$$
 
 where
 
-* \(i\) indexes the individuals,
-* \(t_i\) is the observed time for individual \(i\),
-* \(\delta_i=1\) if individual \(i\) experienced the event at \(t_i\) and \(0\) otherwise,
-* \(\mathbf{x}_i(t)\) is the time-varying covariate vector for individual \(i\) at time \(t\),
-* \(\boldsymbol{\beta}\) is a vector of regression coefficients,
-* \(R(t_i)\) is the risk set at time \(t_i\). 
+-   $i$ indexes the individuals,
+-   $t_i$ is the observed time for individual $i$,
+-   $\delta_i=1$ if individual $i$ experienced the event at $t_i$ and
+    $0$ otherwise,
+-   $\mathbf{x}_i(t)$ is the time-varying covariate vector for
+    individual $i$ at time $t$,
+-   $\boldsymbol{\beta}$ is a vector of regression coefficients,
+-   $R(t_i)$ is the risk set at time $t_i$.
 
 <!-- TODO Clearly defined notation?? -->
 
 # D.2.
-Let \(\boldsymbol{\beta} = (\beta_1,\ldots,\beta_p)\),
-\(\mathbf{x}_i(t) = (x_{i,1}(t),\ldots,x_{i,p}(t))\) for all \(t\) and \(i\in\{1,\ldots,n\}\).
 
-Partial log-likelihood:
-\begin{align*}
+Let $\boldsymbol{\beta} = (\beta_1,\ldots,\beta_p)$,
+$\mathbf{x}_i(t) = (x_{i,1}(t),\ldots,x_{i,p}(t))$ for all $t$ and
+$i\in\{1,\ldots,n\}$.
+
+Partial log-likelihood: \begin{align*}
     & \ln L(\boldsymbol{\beta}) \\
     =& \ln \prod_{i=1}^n \left(\frac{\exp(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta})}{\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})}\right)^{\delta_i} \\
     =& \sum_{i=1}^n \delta_i\ln\frac{\exp(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta})}{\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})} \\
@@ -298,18 +298,18 @@ Partial log-likelihood:
 \end{align*}
 
 Let
-\[g(\boldsymbol{\beta}) = \sum_{j\in R(t_i)} \exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right)\]
+$$g(\boldsymbol{\beta}) = \sum_{j\in R(t_i)} \exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right)$$
 with derivative:
 
+```{=tex}
 \begin{align*}
     & \frac{d}{d\beta_k}g(\boldsymbol{\beta}) \\
     =& \frac{d}{d\beta_k}\sum_{j\in R(t_i)} \exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right) \\
     =& \sum_{j\in R(t_i)} \left(\frac{d}{d\beta_k}\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right)\exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right) \\
     =& \sum_{j\in R(t_i)} x_{j,k}(t_i)\exp\left(\sum_{s=1}^p x_{j,s}(t_i)\beta_s\right) \\
 \end{align*}
-
-Score:
-\begin{align*}
+```
+Score: \begin{align*}
     & \frac{d}{d\beta_k}\ln L(\boldsymbol{\beta}) \\
     =& \frac{d}{d\beta_k}\sum_{i=1}^n \delta_i\left(\sum_{s=1}^p x_{i,s}(t_i)\beta_s - \ln g(\boldsymbol{\beta})\right) \\
     =& \sum_{i=1}^n \delta_i\left(\frac{d}{d\beta_k}\sum_{s=1}^p x_{i,s}(t_i)\beta_s - \frac{d}{d\beta_k}\ln g(\boldsymbol{\beta})\right) \\
@@ -320,50 +320,54 @@ Score:
 
 # D.3.
 
-For the Cox proportional hazards model with time-varying effects, the hazard of individual \(i\) at time \(t\) is given by:
-\[h(t|\mathbf{x}) = h_0(t)\exp(\boldsymbol{\beta}^\top \mathbf{x}_i(t))\]
+For the Cox proportional hazards model with time-varying effects, the
+hazard of individual $i$ at time $t$ is given by:
+$$h(t|\mathbf{x}) = h_0(t)\exp(\boldsymbol{\beta}^\top \mathbf{x}_i(t))$$
 
-In this case, we know that \(\mathbf{x}_i(t) = (z_i,z_i t)\) where \(z_i\in\{0,1\}\). Let the corresponding coefficients be \(\boldsymbol{\beta} = (\beta_1,\beta_2)\).
+In this case, we know that $\mathbf{x}_i(t) = (z_i,z_i t)$ where
+$z_i\in\{0,1\}$. Let the corresponding coefficients be
+$\boldsymbol{\beta} = (\beta_1,\beta_2)$.
 
+```{=tex}
 \begin{align*}
     & h(t|\mathbf{x}) \\
     =& h_0(t)\exp(\boldsymbol{\beta}^\top \mathbf{x}_i(t)) \\
     =& h_0(t)\exp\left(\begin{bmatrix}\beta_1 & \beta_2\end{bmatrix}\begin{bmatrix}z_i \\ z_i t\end{bmatrix}\right) \\
     =& h_0(t)\exp\left(\beta_1 z_i + \beta_2 z_i t\right) \\
 \end{align*}
-
+```
 Hazard ratio:
 
+```{=tex}
 \begin{align*}
     & \frac{h(t|(1,t))}{h(t|(0,0))} \\
     =& \frac{h_0(t)\exp\left(\beta_1 \cdot 1 + \beta_2 \cdot 1 t\right)}{h_0(t)\exp\left(\beta_1 \cdot 0 + \beta_2 \cdot 0 \cdot t\right)} \\
     =& \exp\left(\beta_1 + \beta_2 t\right) \\
 \end{align*}
-
+```
 # D.4.
 
 Let
-\[\mathbf{x}(t) = (\text{stage}_{\text{Unk}},\text{stage}_{\text{Reg}},\text{stage}_{\text{Dis}},\text{stage}_{\text{Dis}} \cdot t)\]
-where each \(\text{stage}_{i} \in \{0,1\}\).
+$$\mathbf{x}(t) = (\text{stage}_{\text{Unk}},\text{stage}_{\text{Reg}},\text{stage}_{\text{Dis}},\text{stage}_{\text{Dis}} \cdot t)$$
+where each $\text{stage}_{i} \in \{0,1\}$.
 
 Regression model:
 
-\[\ln h(t|\mathbf{x}) = \ln h_0(t) + \beta_{\text{Unk}} \text{stage}_{\text{Unk}} + \beta_{\text{Reg}}\text{stage}_{\text{Reg}} + \beta_{tt}\text{stage}_{\text{Dis}} t\]
+$$\ln h(t|\mathbf{x}) = \ln h_0(t) + \beta_{\text{Unk}} \text{stage}_{\text{Unk}} + \beta_{\text{Reg}}\text{stage}_{\text{Reg}} + \beta_{tt}\text{stage}_{\text{Dis}} t$$
 
-\(h_0\) denotes the baseline hazards function.
-The coefficients
-\(\beta_{\text{Unk}}\),
-\(\beta_{\text{Reg}}\),
-\(\beta_{\text{Dis}}\) are
-log-hazard ratios for the respective stages, relative
-to the reference stage "Localised", at time \(t=0\).
+$h_0$ denotes the baseline hazards function. The coefficients
+$\beta_{\text{Unk}}$, $\beta_{\text{Reg}}$, $\beta_{\text{Dis}}$ are
+log-hazard ratios for the respective stages, relative to the reference
+stage "Localised", at time $t=0$.
 
-\(\beta_tt\) is the change in the log-hazard ratio for the "Distant" stage (relative to "Localised") per year increase in survival time.
+$\beta_tt$ is the change in the log-hazard ratio for the "Distant" stage
+(relative to "Localised") per year increase in survival time.
 
 ```{r, echo=FALSE, message=FALSE}
 library(survival)
 library(biostat3)
 ```
+
 ```{r}
 model <- coxph(Surv(surv_mm, status == "Dead: cancer") ~ stage + tt(stage),
   data = transform(biostat3::colon, stage = relevel(stage, "Localised")),
@@ -374,29 +378,31 @@ summary(model)
 
 Interpretation:
 
-* \(\beta_{\text{Unk}} \approx 0.94\) is the estimated log-hazard ratio for the "Unknown" stage. The estimated hazard ratio is
-\(\exp(\beta_{\text{Unk}}) \approx 2.56\).
-Meaning, the hazard for colon cancer patients in the "Unknown" stage
-is 2.56 times that of patients in the "Localised" stage.
-* \(\beta_{\text{Reg}} \approx 0.80\) is the estimated log-hazard ratio for the "Regional" stage. The estimated hazard ratio is
-\(\exp(\beta_{\text{Reg}}) \approx 2.23\).
-Meaning, the estimated hazard for colon cancer patients in the "Regional" stage
-is 2.23 times that of patients in the "Localised" stage.
-* \(\beta_{\text{Dis}} \approx 2.22\) is the estimated log-hazard ratio for the "Distant" stage. The estimated hazard ratio is
-\(\exp(\beta_{\text{Dis}}) \approx 9.20\).
-Meaning, the estimated hazard for colon cancer patients in the "Distant" stage
-is 9.20 times that of patients in the "Localised" stage at time \(t=0\).
-* \(\beta_{tt} \approx -0.12\) is the estimated per-year change in the log-hazard ratio for "Distant" vs. "Localised".
-The corresponding estimaed change in hazard ratio is
-\(\exp(\beta_{tt}) \approx 0.88\).
-Meaning, each additional year of follow-up
-multiplies the hazard ratio for "Distant" vs. "Localised" by
-about 0.88.
-In other words, the hazard ratio for "Distant" vs. "Localised"
-decreases by about 12 % each year after \(t=0\).
+-   $\beta_{\text{Unk}} \approx 0.94$ is the estimated log-hazard ratio
+    for the "Unknown" stage. The estimated hazard ratio is
+    $\exp(\beta_{\text{Unk}}) \approx 2.56$. Meaning, the hazard for
+    colon cancer patients in the "Unknown" stage is 2.56 times that of
+    patients in the "Localised" stage.
+-   $\beta_{\text{Reg}} \approx 0.80$ is the estimated log-hazard ratio
+    for the "Regional" stage. The estimated hazard ratio is
+    $\exp(\beta_{\text{Reg}}) \approx 2.23$. Meaning, the estimated
+    hazard for colon cancer patients in the "Regional" stage is 2.23
+    times that of patients in the "Localised" stage.
+-   $\beta_{\text{Dis}} \approx 2.22$ is the estimated log-hazard ratio
+    for the "Distant" stage. The estimated hazard ratio is
+    $\exp(\beta_{\text{Dis}}) \approx 9.20$. Meaning, the estimated
+    hazard for colon cancer patients in the "Distant" stage is 9.20
+    times that of patients in the "Localised" stage at time $t=0$.
+-   $\beta_{tt} \approx -0.12$ is the estimated per-year change in the
+    log-hazard ratio for "Distant" vs. "Localised". The corresponding
+    estimaed change in hazard ratio is $\exp(\beta_{tt}) \approx 0.88$.
+    Meaning, each additional year of follow-up multiplies the hazard
+    ratio for "Distant" vs. "Localised" by about 0.88. In other words,
+    the hazard ratio for "Distant" vs. "Localised" decreases by about 12
+    % each year after $t=0$.
 
-The p-value of each coefficient is well below \(0.05\),
-indicating very strong statistical significance.
+The p-value of each coefficient is well below $0.05$, indicating very
+strong statistical significance.
 
 # E.1.
 
@@ -405,6 +411,7 @@ library(survival)
 library(survminer)
 library(rstpm2)
 ```
+
 ```{r}
 data(brcancer)
 surv_object <- Surv(time = brcancer$rectime, event = brcancer$censrec)
@@ -422,65 +429,67 @@ ggsurvplot(
   title = "Kaplan-Meier survival curves by randomization arm"
 )
 ```
-<div style="text-align: center;">
+
+::: {style="text-align: center;"}
 *Figure 1: Kaplan-Meier curves by randomization arm.*
-</div>
+:::
 
 Figure 1 shows the following:
 
-* The probability of survival decreases over time for both arms,
-indicating that the risk of breast cancer recurrence increases with longer
-follow-up.
-* The curve for the experimental group (`hormon=1`) is consistently above the
-curve for the control group (`hormon=0`), indicating that patients receiving hormonal therapy tend to have higher
-survival probabilities throughout the follow-up period compared to those
-who did not receive hormonal therapy.
-* The curves do not intersect and appear to maintain a consistent separation
-over time, possibly suggesting proportional hazards.
-* The difference in survival probabilities appears to be the most pronounced
-in the period from ~1300 to ~2000 days, where the 95 % confidence intervals
-overlap minimally.
-* The confidence intervals are wider at later timepoints, reflecting
-increased uncertainty due to fewer patients remaining in the study.
-* The curve for the control group includes a steep vertical jump toward the end, indicating
-that the number of patients at risk in this group is in the single-digits
-at this point in time.
-* There seem to be a sudden drop in survival for the experimental group at around
-2000 days. One explanation is that the effect of hormonal therapy on survival
-diminishes after around 2000 days.
-But this could also be coincidental --
-as the study approaches later time points, random variation plays
-a bigger role because fewer patients remain in the risk set.
-* The p-value of the log-rank test is \(p=0.0034 < 0.05\),
-suggesting strong evidence against the null hypothesis that hormonal therapy
-has no effect on survival. There is strong evidence that hormonal therapy
-is associated with an improvement in recurrence-free survival.
+-   The probability of survival decreases over time for both arms,
+    indicating that the risk of breast cancer recurrence increases with
+    longer follow-up.
+-   The curve for the experimental group (`hormon=1`) is consistently
+    above the curve for the control group (`hormon=0`), indicating that
+    patients receiving hormonal therapy tend to have higher survival
+    probabilities throughout the follow-up period compared to those who
+    did not receive hormonal therapy.
+-   The curves do not intersect and appear to maintain a consistent
+    separation over time, possibly suggesting proportional hazards.
+-   The difference in survival probabilities appears to be the most
+    pronounced in the period from \~1300 to \~2000 days, where the 95 %
+    confidence intervals overlap minimally.
+-   The confidence intervals are wider at later timepoints, reflecting
+    increased uncertainty due to fewer patients remaining in the study.
+-   The curve for the control group includes a steep vertical jump
+    toward the end, indicating that the number of patients at risk in
+    this group is in the single-digits at this point in time.
+-   There seem to be a sudden drop in survival for the experimental
+    group at around 2000 days. One explanation is that the effect of
+    hormonal therapy on survival diminishes after around 2000 days. But
+    this could also be coincidental -- as the study approaches later
+    time points, random variation plays a bigger role because fewer
+    patients remain in the risk set.
+-   The p-value of the log-rank test is $p=0.0034 < 0.05$, suggesting
+    strong evidence against the null hypothesis that hormonal therapy
+    has no effect on survival. There is strong evidence that hormonal
+    therapy is associated with an improvement in recurrence-free
+    survival.
 
 <!-- TODO Switch from days -> years? That's what he does in his examples -->
 
 # E.2.
 
-We are interested in learning whether hormonal therapy has
-an effect on the survival of breast cancer patients, and the magnitude
-of the effect.
-A Cox proportional hazards model is appropriate if we
-assume proportional hazards for the two groups over time.
-Our estimand of choice is therefore the hazard ratio of
-hormonal therapy treatment vs. no treatment.
+We are interested in learning whether hormonal therapy has an effect on
+the survival of breast cancer patients, and the magnitude of the effect.
+A Cox proportional hazards model is appropriate if we assume
+proportional hazards for the two groups over time. Our estimand of
+choice is therefore the hazard ratio of hormonal therapy treatment vs.
+no treatment.
 
-Let \(\text{hormon}=1\) if the subject received hormonal therapy and
-\(\text{hormon}=0\) otherwise.
-Let \(\beta_{\text{hormon}}\) be the corresponding regression coefficient.
+Let $\text{hormon}=1$ if the subject received hormonal therapy and
+$\text{hormon}=0$ otherwise. Let $\beta_{\text{hormon}}$ be the
+corresponding regression coefficient.
 
-Let \(h(t|\text{hormon})\) denote the hazard at time \(t\).
-\(h_0(t)\) is the baseline hazard (when \(\text{hormon}=0\)).
+Let $h(t|\text{hormon})$ denote the hazard at time $t$. $h_0(t)$ is the
+baseline hazard (when $\text{hormon}=0$).
 
 Regression model:
 
-\[h(t|\text{hormon}) = h_0(t)\exp(\beta_{\text{hormon}} \text{hormon})\]
+$$h(t|\text{hormon}) = h_0(t)\exp(\beta_{\text{hormon}} \text{hormon})$$
 
-In this model, \(\beta_{\text{hormon}}\) is a log-hazard ratio,
-so our estimand of interest is \(\exp(\beta_{\text{hormon}})\).
+In this model, $\beta_{\text{hormon}}$ is a log-hazard ratio, so our
+estimand of interest is $\exp(\beta_{\text{hormon}})$.
 
 Fitting the regression model:
 
@@ -488,33 +497,37 @@ Fitting the regression model:
 cox_model <- coxph(surv_object ~ hormon, data = brcancer)
 summary(cox_model)
 ```
+
 Hazard ratio for `hormon=1` vs. `hormon=0`:
+
 ```{r}
 exp(coef(cox_model))
 ```
+
 95 % confidence interval:
+
 ```{r}
 exp(confint(cox_model))
 ```
+
 The estimate of the hazard ratio is
-\(\exp(\hat{\beta}_{\text{hormon}}) \approx 0.69\), with a 95 % CI of [0.54, 0.89].
-This indicates that hormonal therapy lowers the hazard by around 31 %
-compared to lack of treatment.
-The confidence interval does not include 1, and the p-value is
-significant at \(p=0.0036 < 0.05\),
-indicating that the effect is statistically
-significant.
+$\exp(\hat{\beta}_{\text{hormon}}) \approx 0.69$, with a 95 % CI of
+[0.54, 0.89]. This indicates that hormonal therapy lowers the hazard by
+around 31 % compared to lack of treatment. The confidence interval does
+not include 1, and the p-value is significant at $p=0.0036 < 0.05$,
+indicating that the effect is statistically significant.
 
 <!-- TODO Should I include other covariates? -->
+
 <!-- https://cran.r-project.org/web/packages/rstpm2/vignettes/SimpleGuide.pdf -->
+
 <!-- https://cran.r-project.org/web/packages/rstpm2/vignettes/Introduction.pdf -->
 
 # E.3.
 
-The Cox model assumes that the effect of hormonal treatment
-on the hazard is constant over time.
-The Schoenfeld residuals should then have no correlation with time
-if the proportional hazards assumption holds.
+The Cox model assumes that the effect of hormonal treatment on the
+hazard is constant over time. The Schoenfeld residuals should then have
+no correlation with time if the proportional hazards assumption holds.
 
 We perform a Schoenfeld residual test:
 
@@ -523,85 +536,86 @@ ph_test <- cox.zph(cox_model)
 ph_test
 ```
 
-Since \(p=0.63\), we fail to reject the null hypothesis that
-the proportional hazards assumption holds for the hormonal therapy treatment
-variable.
-Meaning, there is no significant evidence that the effect of hormonal
-treatment changes over time.
-Hence, the proportional hazards assumption appears to be satisfied,
-making the Cox model suitable.
-We can therefore trust the hazard ratio estimate we found earlier
-to be a valid measure of the effect of hormonal therapy on survival.
+Since $p=0.63$, we fail to reject the null hypothesis that the
+proportional hazards assumption holds for the hormonal therapy treatment
+variable. Meaning, there is no significant evidence that the effect of
+hormonal treatment changes over time. Hence, the proportional hazards
+assumption appears to be satisfied, making the Cox model suitable. We
+can therefore trust the hazard ratio estimate we found earlier to be a
+valid measure of the effect of hormonal therapy on survival.
 
 <!-- TODO Why not model for time-varying hazard ratio + LR test? -->
+
 <!-- Motivate scaled vs. unscaled Schoenfeld residuals -->
+
 <!-- Motivate identity transformation -->
+
 <!-- cox.pdf slide 43 suggests making a plot -->
 
 # E.4.
 
-We can plot the Schoenfeld residuals against time to visually
-inspect the proportional hazards assumption.
-If the assumption is met, the residuals for the `hormon`
-covariate should show no systematic trend over time, i.e. no slope.
-If there is a time-dependent effect, we might see a non-horizontal
-pattern in the residuals.
+We can plot the Schoenfeld residuals against time to visually inspect
+the proportional hazards assumption. If the assumption is met, the
+residuals for the `hormon` covariate should show no systematic trend
+over time, i.e. no slope. If there is a time-dependent effect, we might
+see a non-horizontal pattern in the residuals.
 
 ```{r}
 plot(ph_test)
 ```
-<div style="text-align: center;">
-*Figure 2: Residuals for \(\beta_{\text{hormon}}\).*
-</div>
 
-The Loess-smoothed curve in Figure 2 resembles a horizontal line,
-and the confidence band does not substantially deviate from it.
-This suggests that there is no strong evidence that the hazard
-ratio changes over time, making the proportional hazards assumption valid.
+::: {style="text-align: center;"}
+*Figure 2: Residuals for* $\beta_{\text{hormon}}$.
+:::
+
+The Loess-smoothed curve in Figure 2 resembles a horizontal line, and
+the confidence band does not substantially deviate from it. This
+suggests that there is no strong evidence that the hazard ratio changes
+over time, making the proportional hazards assumption valid.
 
 <!-- TODO balanced motivation? -->
 
 # F.1.
 
-The estimand of interest is the cause-specific hazard ratio for
-death due to colorectal cancer over five years of follow up,
-comparing the low-dose aspirin arm to the control arm.
+The estimand of interest is the cause-specific hazard ratio for death
+due to colorectal cancer over five years of follow up, comparing the
+low-dose aspirin arm to the control arm.
 
-\[\text{HR} = \frac{h(t|A=1)}{h(t|A=0)}\]
+$$\text{HR} = \frac{h(t|A=1)}{h(t|A=0)}$$
 
-To find a suitable estimator, the standard approach is to
-assume proportional hazards and
-start off with a Cox proportional hazards model.
+To find a suitable estimator, the standard approach is to assume
+proportional hazards and start off with a Cox proportional hazards
+model.
 
-\[h(t|A,X) = h_0(t)\exp(\beta A + \gamma X)\]
+$$h(t|A,X) = h_0(t)\exp(\beta A + \gamma X)$$
 
-Since this is a randomized controlled trial,
-the values of explanatory variables should be balanced between
-treatment groups. Hence,
-on average, both measured and unmeasured confounders should be equally
-distributed across treatment groups, and
-confounding is expected to be minimal.
+Since this is a randomized controlled trial, the values of explanatory
+variables should be balanced between treatment groups. Hence, on
+average, both measured and unmeasured confounders should be equally
+distributed across treatment groups, and confounding is expected to be
+minimal.
 
-However, it is possible that the sample size is too small.
-Hence, some confounders may sitll be unevenly distributed by chance.
+However, it is possible that the sample size is too small. Hence, some
+confounders may sitll be unevenly distributed by chance.
 
-If strong imbalances exist, stratify on key variables rather
-than adjusting them as covariates.
-Switch to a stratified Cox model.
+If strong imbalances exist, stratify on key variables rather than
+adjusting them as covariates. Switch to a stratified Cox model.
 
-If proportional hazards are violated, use time-dependent
-Cox models, or consider RMST analysis as an alternative.
+If proportional hazards are violated, use time-dependent Cox models, or
+consider RMST analysis as an alternative.
 
 # F.2.
 
-It is helpful if the model is collapsible, so that the
-marginal estimate without the unmeasured covariates is the same
-parameter as the conditional estimate.
+It is helpful if the model is collapsible, so that the marginal estimate
+without the unmeasured covariates is the same parameter as the
+conditional estimate.
 
-Cox proportional hazards model is non-collapsible.
-Aalen's additive model is collapsible.
+Cox proportional hazards model is non-collapsible. Aalen's additive
+model is collapsible.
 
-Non-collapsibility is less of an issue with (i) rare events and (ii)
-a small frailty.
+Non-collapsibility is less of an issue with (i) rare events and (ii) a
+small frailty.
 
 <!-- TODO lecture_miscel.pdf slide 33 -->
+
+# References
