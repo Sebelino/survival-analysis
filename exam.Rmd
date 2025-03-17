@@ -557,7 +557,7 @@ valid measure of the effect of hormonal therapy on survival.
 We can plot the Schoenfeld residuals against time to visually inspect
 the proportional hazards assumption. If the assumption is met, the
 residuals for the `hormon` covariate should show no systematic trend
-over time, i.e. no slope. If there is a time-dependent effect, we might
+over time, i.e. no slope. If there is a time-dependent effect, we expect to
 see a non-horizontal pattern in the residuals.
 
 ```{r}
@@ -569,40 +569,87 @@ plot(ph_test)
 :::
 
 The Loess-smoothed curve in Figure 2 resembles a horizontal line, and
-the confidence band does not substantially deviate from it. This
-suggests that there is no strong evidence that the hazard ratio changes
+the confidence band does not substantially deviate from it.
+Thus, there is no evidence that the hazard ratio changes
 over time, making the proportional hazards assumption valid.
 
 <!-- TODO balanced motivation? -->
 
 # F.1.
 
+We first need to determine the estimand of interest.
+In this scenario, we want to investigate the effect of an exposure
+on the survival of colorectal cancer patients.
+Our exposure variable is binary (aspirin vs. no aspirin),
+whereas our response variable is time to cause-specific death.
+We are therefore interested in estimating a measure of association
+between these two variables. There are several candidates:
+hazard ratio, hazard difference, survival probability difference,
+restricted mean survival time (RMST) difference.
+The standard choice of measure for this type of study would be hazard ratio.
+Hazard difference carries the disadvantage of being unstable over time
+and thus difficult to interpret, as hazards generally change over time.
+Survival probability does not account for competing risks,
+such as death due to other causes.
+RMST difference could be a valuable alternative if
+hazards are non-proportional,
+but requires carefully selecting a suitable time horizon \(\tau\).
+Since the event of interest is cause-specific death, we are specifically
+interested in the cause-specific hazard ratio.
+
 The estimand of interest is the cause-specific hazard ratio for death
 due to colorectal cancer over five years of follow up, comparing the
 low-dose aspirin arm to the control arm.
 
-$$\text{HR} = \frac{h(t|A=1)}{h(t|A=0)}$$
+$$\text{HR} = \frac{h(t|X=1)}{h(t|X=0)}$$
 
 To find a suitable estimator, the standard approach is to assume
 proportional hazards and start off with a Cox proportional hazards
 model.
 
-$$h(t|A,X) = h_0(t)\exp(\beta A + \gamma X)$$
+$$h(t|X) = h_0(t)\exp(\beta X)$$
 
 Since this is a randomized controlled trial, the values of explanatory
 variables should be balanced between treatment groups. Hence, on
-average, both measured and unmeasured confounders should be equally
+average, both measured and unmeasured sources of confounding
+is expected to be equally
 distributed across treatment groups, and confounding is expected to be
 minimal.
 
-However, it is possible that the sample size is too small. Hence, some
-confounders may sitll be unevenly distributed by chance.
+However,
+we need to consider that the number of subject with both colorectal cancer
+and the genetic signature may be small.
+It is therefore possible that we will have to work with a small sample size.
+Hence, some
+confounders may still be unevenly distributed by chance.
+To assess confounding, we would check baseline characteristics
+(age, sex, stage at diagnosis, etc.)
+for imbalances between the experimental arm and the control arm.
 
-If strong imbalances exist, stratify on key variables rather than
-adjusting them as covariates. Switch to a stratified Cox model.
+We would then produce a baseline table (Table 1)
+comparing these characteristics by randomization arm.
+If strong imbalances exist, we would stratify on key variables rather than
+adjusting them as covariates. We would then switch to a stratified Cox model.
+The primary reason for adjusting is to account for meaningful differences that might threaten the randomization assumption (especially in smaller trials).
 
-If proportional hazards are violated, use time-dependent Cox models, or
+We would plot a Kaplan-Meier curve to visualize survival over time
+for the two groups.
+We would then investigate whether the proportional hazards assumption holds.
+To do this, we would look at the survival curves,
+perform a Schoenfeld residual test, and plot the residuals against time.
+If the survival curves do not cross, the residual test is non-significant,
+and the residual plot shows a horizontal pattern,
+we would assume that the proportional hazards assumption is met.
+
+If proportional hazards are violated, we would need to consider alternative
+models.
+We would switch to stratified Cox regression,
+use time-dependent Cox models, or
 consider RMST analysis as an alternative.
+
+<!-- lecture_miscel slide 13 -->
+<!-- We adjust for S(t), which acts as a collider? -->
+<!-- To Cox-stratify or adjust? -->
 
 # F.2.
 
@@ -617,5 +664,7 @@ Non-collapsibility is less of an issue with (i) rare events and (ii) a
 small frailty.
 
 <!-- TODO lecture_miscel.pdf slide 33 -->
+<!-- Estimand: hazard ratio, hazard diff, risk diff... -->
+<!-- How to distinguish death vs. cause-specific death? -->
 
 # References
