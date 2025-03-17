@@ -596,10 +596,9 @@ hazards are non-proportional,
 but requires carefully selecting a suitable time horizon \(\tau\).
 Since the event of interest is cause-specific death, we are specifically
 interested in the cause-specific hazard ratio.
+This means that we should treat death due to other causes as a competing risks
+and censor such events.
 
-The estimand of interest is the cause-specific hazard ratio for death
-due to colorectal cancer over five years of follow up, comparing the
-low-dose aspirin arm to the control arm.
 
 $$\text{HR} = \frac{h(t|X=1)}{h(t|X=0)}$$
 
