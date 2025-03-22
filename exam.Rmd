@@ -582,6 +582,10 @@ the proportional hazards assumption. If the assumption is met, the
 residuals for the `hormon` covariate should show no systematic trend
 over time, i.e. no slope. If there is a time-dependent effect, we expect
 to see a non-horizontal pattern in the residuals.
+The advantage of this method is that
+it is specifically designed for Cox models,
+it complements the formal test (using `cox.zph(...)`),
+and it can be used for each covariate separately, helping isolate potential violations.
 
 ```{r}
 plot(ph_test)
