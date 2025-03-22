@@ -4,13 +4,15 @@ output:
   prettydoc::html_pretty:
     theme: cayman
     highlight: github
+  html_document:
+    df_print: paged
   pdf_document:
     latex_engine: xelatex
-editor_options: 
-  markdown: 
+editor_options:
+  markdown:
     wrap: 72
 bibliography: references.bib
-csl: vancouver-brackets.csl
+csl: "vancouver-brackets.csl"
 ---
 
 # AI disclosure
@@ -151,11 +153,11 @@ passed to the function via the `time`, `time2`, and `origin` arguments
 in a bijective manner. That is, the `Surv` function is not implemented
 in a way such that, for example, the data contained in the $t_i$ and
 $u_i$ values are cleverly encoded together so they can be passed using a
-single argument, e.g. `time`. A quick look at the source code supports
+single argument, e.g. `time`. A quick glance at the source code supports
 this premise.
 
-The documentation and source code show that the `origin` argument
-simply shifts the time scale, by subtracting from `time` and `time2`.
+The documentation and source code show that the `origin` argument simply
+shifts the time scale, by subtracting from `time` and `time2`.
 Therefore, this argument cannot be used to specify left truncation or
 any of the interval endpoints. In addition, the `if` statement in the
 source code reveals that left truncation requires `type='counting'`
@@ -170,8 +172,6 @@ incorrect. It is not possible to express the tuple $(t_i,u_i,v_i)$ using
 the `Surv` function.
 
 <!-- TODO Argument can prolly be made more solid -->
-
-<!-- TODO add REFERENCES -->
 
 # C.1.
 
@@ -207,7 +207,7 @@ $t=Q(p\,|\,t_0)$ and assuming $t_0\leq t$, we get:
     \Rightarrow& Q(p\,|\,t_0) = Q(1-(1-p)S(t_0))  \\
 \end{align*}
 ```
-<!-- Not accounting for t0>t -->
+<!-- TODO Not accounting for t0>t -->
 
 # C.3.
 
@@ -231,9 +231,12 @@ qlnorm(prob, meanlog = mu, sdlog = sigma)
 
 Thus: $$Q(0.4\,|\,2) = Q(1-(1-0.4)(1-F_T(2))) \approx 4.2$$
 
-<!-- Not accounting for t0>t -->
+<!-- TODO Not accounting for t0>t -->
 
 # C.4.
+
+By sampling from the truncated distribution, we can use the empirical
+quantile to approximate the true quantile.
 
 ```{r}
 #' @param n the number of random numbers
@@ -266,7 +269,9 @@ equal to our value in C3: $$4.178294 \approx 4.171994$$
 
 # D.1.
 
-Partial likelihood:
+The partial likelihood in the Cox model with time-varying effects is a
+product over the event times:
+
 $$L(\boldsymbol{\beta}) = \prod_{i=1}^n \left(\frac{\exp(\mathbf{x}_i(t_i)^\top\boldsymbol{\beta})}{\sum_{j\in R(t_i)} \exp(\mathbf{x}_j(t_i)^\top\boldsymbol{\beta})}\right)^{\delta_i}$$
 
 where
@@ -281,6 +286,8 @@ where
 -   $R(t_i)$ is the risk set at time $t_i$.
 
 <!-- TODO Clearly defined notation?? -->
+
+<!-- TODO Justification needed? -->
 
 # D.2.
 
@@ -406,6 +413,9 @@ strong statistical significance.
 
 # E.1.
 
+We use `survfit` to fit Kaplan-Meier survival curves stratified by the
+binary variable `hormon`, then plot the curves using `ggsurvplot`:
+
 ```{r, message=FALSE}
 library(survival)
 library(survminer)
@@ -512,9 +522,9 @@ exp(confint(cox_model))
 
 The estimate of the hazard ratio is
 $\exp(\hat{\beta}_{\text{hormon}}) \approx 0.69$, with a 95 % CI of
-[0.54, 0.89]. This indicates that hormonal therapy lowers the hazard by
-around 31 % compared to lack of treatment. The confidence interval does
-not include 1, and the p-value is significant at $p=0.0036 < 0.05$,
+$[0.54, 0.89]$. This indicates that hormonal therapy lowers the hazard
+by around 31 % compared to lack of treatment. The confidence interval
+does not include 1, and the p-value is significant at $p=0.0036 < 0.05$,
 indicating that the effect is statistically significant.
 
 <!-- TODO Should I include other covariates? -->
@@ -525,14 +535,35 @@ indicating that the effect is statistically significant.
 
 # E.3.
 
-The Cox model assumes that the effect of hormonal treatment on the
-hazard is constant over time. The Schoenfeld residuals should then have
-no correlation with time if the proportional hazards assumption holds.
+One way to test for proportional hazards is to fit an extended Cox model
+with an explicit time-by-covariate interaction term. We would then
+perform a likelihood ratio test to attempt to reject the null hypothesis
+that the model without time-varying effects is adequate. However, this
+requires selecting a specific form of the time-varying hazard ratio, and
+it may not be obvious how to specify it.
 
-We perform a Schoenfeld residual test:
+A more model-agnostic approach is to perform a Schoenfeld residuals
+test. This test checks for time dependence in covariate effects
+non-parametrically by examining the correlation between scaled
+Schoenfeld residuals and time. The Cox model assumes that the effect of
+hormonal treatment on the hazard is constant over time. The Schoenfeld
+residuals should then have no correlation with time if the proportional
+hazards assumption holds.
+
+When performing the test, we should choose scaled residuals over
+unscaled residuals. Grambsch and Thereau [@grambsch1994] showed
+that scaled residuals have better properties such as
+approximately constant variance over time.
+This means standard statistical methods can be applied,
+including a chi-square test.
+We can also consider whether we want to scale time in the residual regression.
+Using an identity transform (`transform = "identity"`) regresses scaled Schoenfeld residuals on raw time, which is appropriate when we are interested in assessing or interpreting time-varying effects on the original time scale. Alternatively, the Kaplan-Meier transform (`transform = "km"`) uses the Kaplan-Meier estimate of survival as the time scale, which can improve power and robustness in the presence of heavy or nonuniform censoring. This transformation reflects the amount of information available at each time point and is particularly useful when the hazard function or censoring distribution is highly variable, which may be the case here.
+
+In our scenario, we want to use the test to check whether the effect of
+the covariate (`hormon`) changes over time:
 
 ```{r}
-ph_test <- cox.zph(cox_model)
+ph_test <- cox.zph(cox_model, transform = "km")
 ph_test
 ```
 
@@ -544,21 +575,13 @@ assumption appears to be satisfied, making the Cox model suitable. We
 can therefore trust the hazard ratio estimate we found earlier to be a
 valid measure of the effect of hormonal therapy on survival.
 
-<!-- TODO Why not model for time-varying hazard ratio + LR test? -->
-
-<!-- Motivate scaled vs. unscaled Schoenfeld residuals -->
-
-<!-- Motivate identity transformation -->
-
-<!-- cox.pdf slide 43 suggests making a plot -->
-
 # E.4.
 
 We can plot the Schoenfeld residuals against time to visually inspect
 the proportional hazards assumption. If the assumption is met, the
 residuals for the `hormon` covariate should show no systematic trend
-over time, i.e. no slope. If there is a time-dependent effect, we expect to
-see a non-horizontal pattern in the residuals.
+over time, i.e. no slope. If there is a time-dependent effect, we expect
+to see a non-horizontal pattern in the residuals.
 
 ```{r}
 plot(ph_test)
@@ -569,36 +592,32 @@ plot(ph_test)
 :::
 
 The Loess-smoothed curve in Figure 2 resembles a horizontal line, and
-the confidence band does not substantially deviate from it.
-Thus, there is no evidence that the hazard ratio changes
-over time, making the proportional hazards assumption valid.
+the confidence band does not substantially deviate from it. Thus, there
+is no evidence that the hazard ratio changes over time, making the
+proportional hazards assumption valid.
 
 <!-- TODO balanced motivation? -->
 
 # F.1.
 
-We first need to determine the estimand of interest.
-In this scenario, we want to investigate the effect of an exposure
-on the survival of colorectal cancer patients.
-Our exposure variable is binary (aspirin vs. no aspirin),
-whereas our response variable is time to cause-specific death.
-We are therefore interested in estimating a measure of association
-between these two variables. There are several candidates:
+We first need to determine the estimand of interest. In this scenario,
+we want to investigate the effect of an exposure on the survival of
+colorectal cancer patients. Our exposure variable is binary (aspirin vs.
+no aspirin), whereas our response variable is time to cause-specific
+death. We are therefore interested in estimating a measure of
+association between these two variables. There are several candidates:
 hazard ratio, hazard difference, survival probability difference,
-restricted mean survival time (RMST) difference.
-The standard choice of measure for this type of study would be hazard ratio.
-Hazard difference carries the disadvantage of being unstable over time
-and thus difficult to interpret, as hazards generally change over time.
-Survival probability does not account for competing risks,
-such as death due to other causes.
-RMST difference could be a valuable alternative if
-hazards are non-proportional,
-but requires carefully selecting a suitable time horizon \(\tau\).
-Since the event of interest is cause-specific death, we are specifically
-interested in the cause-specific hazard ratio.
-This means that we should treat death due to other causes as a competing risks
-and censor such events.
-
+restricted mean survival time (RMST) difference. The standard choice of
+measure for this type of study would be hazard ratio. Hazard difference
+carries the disadvantage of being unstable over time and thus difficult
+to interpret, as hazards generally change over time. Survival
+probability does not account for competing risks, such as death due to
+other causes. RMST difference could be a valuable alternative if hazards
+are non-proportional, but requires carefully selecting a suitable time
+horizon $\tau$. Since the event of interest is cause-specific death, we
+are specifically interested in the cause-specific hazard ratio. This
+means that we should treat death due to other causes as a competing
+risks and censor such events.
 
 $$\text{HR} = \frac{h(t|X=1)}{h(t|X=0)}$$
 
@@ -610,45 +629,44 @@ $$h(t|X) = h_0(t)\exp(\beta X)$$
 
 Since this is a randomized controlled trial, the values of explanatory
 variables should be balanced between treatment groups. Hence, on
-average, both measured and unmeasured sources of confounding
-is expected to be equally
-distributed across treatment groups, and confounding is expected to be
-minimal.
+average, both measured and unmeasured sources of confounding is expected
+to be equally distributed across treatment groups, and confounding is
+expected to be minimal.
 
-However,
-we need to consider that the number of subject with both colorectal cancer
-and the genetic signature may be small.
-It is therefore possible that we will have to work with a small sample size.
-Hence, some
-confounders may still be unevenly distributed by chance.
-To assess confounding, we would check baseline characteristics
-(age, sex, stage at diagnosis, etc.)
-for imbalances between the experimental arm and the control arm.
+However, we need to consider that the number of subject with both
+colorectal cancer and the genetic signature may be small. It is
+therefore possible that we will have to work with a small sample size.
+Hence, some confounders may still be unevenly distributed by chance. To
+assess confounding, we would check baseline characteristics (age, sex,
+stage at diagnosis, etc.) for imbalances between the experimental arm
+and the control arm.
 
-We would then produce a baseline table (Table 1)
-comparing these characteristics by randomization arm.
-If strong imbalances exist, we would stratify on key variables rather than
-adjusting them as covariates. We would then switch to a stratified Cox model.
-The primary reason for adjusting is to account for meaningful differences that might threaten the randomization assumption (especially in smaller trials).
+We would then produce a baseline table (Table 1) comparing these
+characteristics by randomization arm. If strong imbalances exist, we
+would stratify on key variables rather than adjusting them as
+covariates. We would then switch to a stratified Cox model. The primary
+reason for adjusting is to account for meaningful differences that might
+threaten the randomization assumption (especially in smaller trials).
 
-We would plot a Kaplan-Meier curve to visualize survival over time
-for the two groups.
-We would then investigate whether the proportional hazards assumption holds.
-To do this, we would look at the survival curves,
-perform a Schoenfeld residual test, and plot the residuals against time.
-If the survival curves do not cross, the residual test is non-significant,
-and the residual plot shows a horizontal pattern,
-we would assume that the proportional hazards assumption is met.
+We would plot a Kaplan-Meier curve to visualize survival over time for
+the two groups. We would then investigate whether the proportional
+hazards assumption holds. To do this, we would look at the survival
+curves, perform a Schoenfeld residual test, and plot the residuals
+against time. If the survival curves do not cross, the residual test is
+non-significant, and the residual plot shows a horizontal pattern, we
+would assume that the proportional hazards assumption is met.
 
-If proportional hazards are violated, we would need to consider alternative
-models.
-We would switch to stratified Cox regression,
-use time-dependent Cox models, or
-consider RMST analysis as an alternative.
+If proportional hazards are violated, we would need to consider
+alternative models. We would switch to stratified Cox regression, use
+time-dependent Cox models, or consider RMST analysis as an alternative.
 
 <!-- lecture_miscel slide 13 -->
+
 <!-- We adjust for S(t), which acts as a collider? -->
+
 <!-- To Cox-stratify or adjust? -->
+
+<!-- Intent-to-treat vs per-protocol -->
 
 # F.2.
 
@@ -663,7 +681,9 @@ Non-collapsibility is less of an issue with (i) rare events and (ii) a
 small frailty.
 
 <!-- TODO lecture_miscel.pdf slide 33 -->
+
 <!-- Estimand: hazard ratio, hazard diff, risk diff... -->
+
 <!-- How to distinguish death vs. cause-specific death? -->
 
 # References
