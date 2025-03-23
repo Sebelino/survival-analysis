@@ -329,7 +329,7 @@ Score: \begin{align*}
 
 For the Cox proportional hazards model with time-varying effects, the
 hazard of individual $i$ at time $t$ is given by:
-$$h(t|\mathbf{x}) = h_0(t)\exp(\boldsymbol{\beta}^\top \mathbf{x}_i(t))$$
+$$h(t|\mathbf{x}_i(t)) = h_0(t)\exp(\boldsymbol{\beta}^\top \mathbf{x}_i(t))$$
 
 In this case, we know that $\mathbf{x}_i(t) = (z_i,z_i t)$ where
 $z_i\in\{0,1\}$. Let the corresponding coefficients be
@@ -337,7 +337,7 @@ $\boldsymbol{\beta} = (\beta_1,\beta_2)$.
 
 ```{=tex}
 \begin{align*}
-    & h(t|\mathbf{x}) \\
+    & h(t|\mathbf{x}_i(t)) \\
     =& h_0(t)\exp(\boldsymbol{\beta}^\top \mathbf{x}_i(t)) \\
     =& h_0(t)\exp\left(\begin{bmatrix}\beta_1 & \beta_2\end{bmatrix}\begin{bmatrix}z_i \\ z_i t\end{bmatrix}\right) \\
     =& h_0(t)\exp\left(\beta_1 z_i + \beta_2 z_i t\right) \\
@@ -360,14 +360,15 @@ where each $\text{stage}_{i} \in \{0,1\}$.
 
 Regression model:
 
-$$\ln h(t|\mathbf{x}) = \ln h_0(t) + \beta_{\text{Unk}} \text{stage}_{\text{Unk}} + \beta_{\text{Reg}}\text{stage}_{\text{Reg}} + \beta_{tt}\text{stage}_{\text{Dis}} t$$
+$$\ln h(t|\mathbf{x}(t)) = \ln h_0(t) + \beta_{\text{Unk}} \text{stage}_{\text{Unk}} + \beta_{\text{Reg}}\text{stage}_{\text{Reg}} + \beta_{tt}\text{stage}_{\text{Dis}} t$$
 
 $h_0$ denotes the baseline hazards function. The coefficients
 $\beta_{\text{Unk}}$, $\beta_{\text{Reg}}$, $\beta_{\text{Dis}}$ are
-log-hazard ratios for the respective stages, relative to the reference
+log-hazard ratios for the "Unknown", "Regional" and "Distant" stages,
+relative to the reference
 stage "Localised", at time $t=0$.
 
-$\beta_tt$ is the change in the log-hazard ratio for the "Distant" stage
+$\beta_{tt}$ is the change in the log-hazard ratio for the "Distant" stage
 (relative to "Localised") per year increase in survival time.
 
 ```{r, echo=FALSE, message=FALSE}
@@ -645,6 +646,8 @@ $$h(t|X) = h_0(t)\exp(\beta X)$$
 
 where $h_0(t)$ is the baseline hazard at $t$ and $\beta$ is the
 regression parameter corresponding to $X$.
+Our estimator is then the random variable $\exp(\hat{\beta})$,
+where \(\hat{\beta}\) denotes an estimator of the coefficient \(\beta\) obtained by fitting a Cox model.
 
 Since this is a randomized controlled trial, the values of explanatory
 variables should be balanced between treatment groups. Hence, on
@@ -676,7 +679,10 @@ errors were found, we would consider adjusting for these covariates.
 
 Next, we would investigate whether the proportional hazards assumption
 holds.
-We would start by plotting a Kaplan-Meier curve to visualize survival
+We would start by fitting a Cox proportional hazards model and
+making a table of the regression coefficients,
+hazard ratios, confidence intervals and p-values.
+We would then plot the Kaplan-Meier curve to visualize survival
 over time for
 the two groups. We would then inspect the survival
 curves, perform a Schoenfeld residual test, and plot the residuals
