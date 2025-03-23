@@ -551,13 +551,21 @@ residuals should then have no correlation with time if the proportional
 hazards assumption holds.
 
 When performing the test, we should choose scaled residuals over
-unscaled residuals. Grambsch and Thereau [@grambsch1994] showed
-that scaled residuals have better properties such as
-approximately constant variance over time.
-This means standard statistical methods can be applied,
-including a chi-square test.
-We can also consider whether we want to scale time in the residual regression.
-Using an identity transform (`transform = "identity"`) regresses scaled Schoenfeld residuals on raw time, which is appropriate when we are interested in assessing or interpreting time-varying effects on the original time scale. Alternatively, the Kaplan-Meier transform (`transform = "km"`) uses the Kaplan-Meier estimate of survival as the time scale, which can improve power and robustness in the presence of heavy or nonuniform censoring. This transformation reflects the amount of information available at each time point and is particularly useful when the hazard function or censoring distribution is highly variable, which may be the case here.
+unscaled residuals. Grambsch and Thereau [@grambsch1994] showed that
+scaled residuals have better properties such as approximately constant
+variance over time. This means standard statistical methods can be
+applied, including a chi-square test. We can also consider whether we
+want to scale time in the residual regression. Using an identity
+transform (`transform = "identity"`) regresses scaled Schoenfeld
+residuals on raw time, which is appropriate when we are interested in
+assessing or interpreting time-varying effects on the original time
+scale. Alternatively, the Kaplan-Meier transform (`transform = "km"`)
+uses the Kaplan-Meier estimate of survival as the time scale, which can
+improve power and robustness in the presence of heavy or nonuniform
+censoring. This transformation reflects the amount of information
+available at each time point and is particularly useful when the hazard
+function or censoring distribution is highly variable, which may be the
+case here.
 
 In our scenario, we want to use the test to check whether the effect of
 the covariate (`hormon`) changes over time:
@@ -581,11 +589,10 @@ We can plot the Schoenfeld residuals against time to visually inspect
 the proportional hazards assumption. If the assumption is met, the
 residuals for the `hormon` covariate should show no systematic trend
 over time, i.e. no slope. If there is a time-dependent effect, we expect
-to see a non-horizontal pattern in the residuals.
-The advantage of this method is that
-it is specifically designed for Cox models,
-it complements the formal test (using `cox.zph(...)`),
-and it can be used for each covariate separately, helping isolate potential violations.
+to see a non-horizontal pattern in the residuals. The advantage of this
+method is that it is specifically designed for Cox models, it
+complements the formal test (using `cox.zph(...)`), and it can be used
+for each covariate separately, helping isolate potential violations.
 
 ```{r}
 plot(ph_test)
@@ -606,63 +613,84 @@ proportional hazards assumption valid.
 
 We first need to determine the estimand of interest. In this scenario,
 we want to investigate the effect of an exposure on the survival of
-colorectal cancer patients. Our exposure variable is binary (aspirin vs.
-no aspirin), whereas our response variable is time to cause-specific
-death. We are therefore interested in estimating a measure of
-association between these two variables. There are several candidates:
-hazard ratio, hazard difference, survival probability difference,
-restricted mean survival time (RMST) difference. The standard choice of
-measure for this type of study would be hazard ratio. Hazard difference
-carries the disadvantage of being unstable over time and thus difficult
-to interpret, as hazards generally change over time. Survival
-probability does not account for competing risks, such as death due to
-other causes. RMST difference could be a valuable alternative if hazards
-are non-proportional, but requires carefully selecting a suitable time
+colorectal cancer patients. Our exposure variable $X$ is binary, with
+$X=1$ indicating aspirin treatment and $X=0$ indicating no treatment.
+Our response variable $T$ is time to cause-specific death. We are
+therefore interested in estimating a measure of association between
+these two variables. There are several candidates: hazard ratio, hazard
+difference, survival probability difference, restricted mean survival
+time (RMST) difference. The standard choice of measure for this type of
+study would be the hazard ratio. Hazard difference carries the
+disadvantage of being unstable over time and thus difficult to
+interpret, as hazards generally change over time. Survival probability
+does not account for competing risks, such as death due to other causes.
+RMST difference could be a valuable alternative if hazards are
+non-proportional, but requires carefully selecting a suitable time
 horizon $\tau$. Since the event of interest is cause-specific death, we
 are specifically interested in the cause-specific hazard ratio. This
-means that we should treat death due to other causes as a competing
-risks and censor such events.
+means that we should treat death due to other causes as a competing risk
+and censor such events.
 
-$$\text{HR} = \frac{h(t|X=1)}{h(t|X=0)}$$
+The hazard ratio at time $t$ is given by:
 
-To find a suitable estimator, the standard approach is to assume
-proportional hazards and start off with a Cox proportional hazards
-model.
+$$\text{HR}(t|X) = \frac{h(t|X=1)}{h(t|X=0)}$$
+
+Next, we need to find a suitable estimator. Since this is a randomized
+controlled trial with potential right-censoring, we will start off with
+the standard approach of assuming proportional hazards and the Cox
+proportional hazards model. This means the hazard rate can be expressed
+with the formula:
 
 $$h(t|X) = h_0(t)\exp(\beta X)$$
 
+where $h_0(t)$ is the baseline hazard at $t$ and $\beta$ is the
+regression parameter corresponding to $X$.
+
 Since this is a randomized controlled trial, the values of explanatory
 variables should be balanced between treatment groups. Hence, on
-average, both measured and unmeasured sources of confounding is expected
-to be equally distributed across treatment groups, and confounding is
-expected to be minimal.
+average, both measured and unmeasured sources of confounding, denoted
+$U$, are expected to be equally distributed across treatment groups.
+However, this is only true at time $t=0$. The hazard $h(t|X)$ at time
+$t$ is conditional on surviving to time $t$, so the survival time $S(t)$
+acts as a collider which we implicitly condition on. Hence, at time
+$t+\Delta$, where $\Delta>0$, there is an open path:
+$$X \to S(t) \leftarrow U \to S(t+\Delta) $$ which introduces a spurious
+association between $X$ and $U$. To assess the magnitude of this
+confounding bias, we could use the Cox-specific estimator based on
+the G-computation formula proposed by Martinussen et al. [@martinussen2013].
 
-However, we need to consider that the number of subject with both
+We also need to consider that the number of subjects with both
 colorectal cancer and the genetic signature may be small. It is
 therefore possible that we will have to work with a small sample size.
-Hence, some confounders may still be unevenly distributed by chance. To
-assess confounding, we would check baseline characteristics (age, sex,
-stage at diagnosis, etc.) for imbalances between the experimental arm
-and the control arm.
+Hence, the values of some prognostic covariates may still be unevenly
+distributed by chance. To determine if this is the case, we would check
+baseline characteristics (age, sex, stage at diagnosis, etc.) for
+imbalances between the experimental arm and the control arm. We would do
+this by producing a baseline table (Table 1) comparing these
+characteristics by randomization arm. We would then determine if strong
+imbalances are present using the standardized mean difference (SMD)
+metric. A SMD of, say, 0.2 or greater would be interpreted as a strong
+imbalance. If strong imbalances exist, we would first check for errors
+in our randomization or analysis and redo them if necessary. If no
+errors were found, we would consider adjusting for these covariates.
 
-We would then produce a baseline table (Table 1) comparing these
-characteristics by randomization arm. If strong imbalances exist, we
-would stratify on key variables rather than adjusting them as
-covariates. We would then switch to a stratified Cox model. The primary
-reason for adjusting is to account for meaningful differences that might
-threaten the randomization assumption (especially in smaller trials).
-
-We would plot a Kaplan-Meier curve to visualize survival over time for
-the two groups. We would then investigate whether the proportional
-hazards assumption holds. To do this, we would look at the survival
+Next, we would investigate whether the proportional hazards assumption
+holds.
+We would start by plotting a Kaplan-Meier curve to visualize survival
+over time for
+the two groups. We would then inspect the survival
 curves, perform a Schoenfeld residual test, and plot the residuals
 against time. If the survival curves do not cross, the residual test is
 non-significant, and the residual plot shows a horizontal pattern, we
 would assume that the proportional hazards assumption is met.
 
 If proportional hazards are violated, we would need to consider
-alternative models. We would switch to stratified Cox regression, use
-time-dependent Cox models, or consider RMST analysis as an alternative.
+alternative models.
+We would switch to a stratified Cox regression model to check
+if it fits better.
+If not, we would try a time-dependent Cox model.
+If that also fails, an RMST analysis could be a viable alternative,
+as it does not depend on the proportional hazards assumption.
 
 <!-- lecture_miscel slide 13 -->
 
@@ -670,7 +698,17 @@ time-dependent Cox models, or consider RMST analysis as an alternative.
 
 <!-- To Cox-stratify or adjust? -->
 
+<!-- Small sample size -- adjust for prognostic variables for the sake of improving precision/power? -->
+
 <!-- Intent-to-treat vs per-protocol -->
+
+<!-- Alt: stratified Cox regression -->
+
+<!-- Alt: time-dependent Cox regression -->
+
+<!-- Alt: RMST analysis -->
+
+<!-- Alt: AFT model? -->
 
 # F.2.
 
