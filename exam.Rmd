@@ -712,15 +712,37 @@ as it does not depend on the proportional hazards assumption.
 
 # F.2.
 
-It is helpful if the model is collapsible, so that the marginal estimate
-without the unmeasured covariates is the same parameter as the
-conditional estimate.
+We proposed the hazard ratio from a Cox proportional hazards model
+as the estimator of treatment effect.
+Hazard ratios are non-collapsible [@martinussen2013], meaning
+that the marginal estimate differs from the conditional estimate
+even in the absence of confounding.
+This is potentially an issue because a policymaker might care about
+the population-level effect of the treatment (unadjusted hazard ratio),
+whereas
+a clinician might be more interested in the effect conditional
+on patient characteristics (adjusted hazard ratio).
+Hence, if we are measuring both the adjusted and unadjusted effect,
+we run the risk of misinterpreting the size of the effect.
 
-Cox proportional hazards model is non-collapsible. Aalen's additive
-model is collapsible.
+Non-collapsibility is negligible if the event of interest is rare
+or if the frailty is small.
+Considering that the study goes on for 5 years, and the event of interest
+is cause-specific death, the event can be considered moderately rare.
+The size of the frailty is harder to assess. Since the study
+focuses on a specific genetic signature, this might reduce some heterogeneity.
+But unless the sample is very homogeneous, some frailty likely remains.
 
-Non-collapsibility is less of an issue with (i) rare events and (ii) a
-small frailty.
+Hence, as the events are rare, we can expect the non-collapsibility
+to be less of an issue.
+If we wanted to address non-collapsibility, we could
+switch to another model which involves a collapsible measure of association.
+Examples include:
+the Aalen's additive hazards model, an accelerated failure time model,
+or the RMST difference.
+There would be drawbacks to each of these alternatives, such as
+the fact that the Aalen model is based on the hazard difference,
+and thus arguably harder to interpret clinically.
 
 <!-- TODO lecture_miscel.pdf slide 33 -->
 
