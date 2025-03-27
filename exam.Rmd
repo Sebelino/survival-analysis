@@ -1,13 +1,13 @@
 ---
 title: "Survival Analysis: Take-home Exam"
 output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
   prettydoc::html_pretty:
     theme: cayman
     highlight: github
-  html_document:
-    df_print: paged
-  pdf_document:
-    latex_engine: xelatex
 editor_options:
   markdown:
     wrap: 72
@@ -487,6 +487,16 @@ A Cox proportional hazards model is appropriate if we assume
 proportional hazards for the two groups over time. Our estimand of
 choice is therefore the hazard ratio of hormonal therapy treatment vs.
 no treatment.
+
+Since this is a randomized controlled trial, we can presume that
+the assignment of hormonal therapy is independent of
+measured and unmeasured confounding variables
+thanks to randomization. This simplifies our model, as there is no
+need to adjust for additional covariates besides the exposure variable
+in order to obtain an unbiased estimate of the treatment effect.
+We assume here that our estimand of interest is the population-level effect
+of hormonal treatment, as opposed to a conditional effect
+within specific strata such as age groups.
 
 Let $\text{hormon}=1$ if the subject received hormonal therapy and
 $\text{hormon}=0$ otherwise. Let $\beta_{\text{hormon}}$ be the
