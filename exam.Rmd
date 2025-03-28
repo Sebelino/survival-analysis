@@ -366,7 +366,7 @@ $h_0$ denotes the baseline hazards function. The coefficients
 $\beta_{\text{Unk}}$, $\beta_{\text{Reg}}$, $\beta_{\text{Dis}}$ are
 log-hazard ratios for the "Unknown", "Regional" and "Distant" stages,
 relative to the reference
-stage "Localised", at time $t=0$.
+stage "Localised", at time $t=0$ years.
 
 $\beta_{tt}$ is the change in the log-hazard ratio for the "Distant" stage
 (relative to "Localised") per year increase in survival time.
